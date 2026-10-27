@@ -1,0 +1,60 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+# Playwright MCP session artifacts (snapshots, console logs) — exploration only
+/.playwright-mcp
+/.playwright-cli
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+.vscode/*
+# MCP server list is shared with the team (Copilot / VS Code agent mode)
+!.vscode/mcp.json
+.omc/sessions
+.omc/state
+.omc/project-memory.json
+.claude/worktrees
+
+TIMELINE.md
+REACTIVE_ORDER_FLOW.md
+
+# QA scratch testcase files — not part of the shipped source
+/testcase
+
+# old

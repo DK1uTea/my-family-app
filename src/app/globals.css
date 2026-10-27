@@ -1,0 +1,487 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* CCEP Rhythm — Default width */
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Light.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Light.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Medium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Medium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Dark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Dark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* CCEP Rhythm — Narrow */
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowLight.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowLight.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowMedium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowMedium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowDark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowDark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* CCEP Rhythm — Wide */
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideLight.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideLight.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideMedium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideMedium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideDark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideDark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Typography */
+  --font-sans: var(--font-family-brand);
+  --font-mono: var(--font-geist-mono);
+  --font-brand-narrow: var(--font-family-brand-narrow);
+  --font-brand-wide: var(--font-family-brand-wide);
+
+  /* Core surface tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-light-gray: var(--light-gray);
+  --color-gray-100: var(--gray-100);
+  --color-gray-500: var(--gray-500);
+  --color-gray-800: var(--gray-800);
+
+  /* Brand primary */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+
+  /* Secondary / Muted */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Semantic states */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand surface overrides */
+  --color-background-header: var(--background-header);
+  --color-background-login: var(--background-login);
+
+  /* Footer */
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+  --color-footer-icon: var(--footer-icon);
+  --color-footer-icon-bg: var(--footer-icon-bg);
+  --color-footer-icon-border: var(--footer-icon-border);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Radius scale */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-button: var(--button-radius);
+  --radius-input: var(--input-radius);
+  --radius-input-group: var(--input-group-radius);
+  --radius-select: var(--select-radius);
+  --radius-textarea: var(--textarea-radius);
+  --radius-textarea-float: var(--textarea-float-radius);
+  --radius-input-float: var(--input-float-radius);
+  --radius-select-float: var(--select-float-radius);
+  --radius-editor: var(--editor-radius);
+  --radius-date-picker: var(--date-picker-radius);
+  --radius-detail-field: var(--detail-field-radius);
+  --radius-choice: var(--choice-radius);
+  --radius-sidebar-item: var(--sidebar-item-radius);
+}
+
+@layer base {
+  :root {
+    --light-gray: oklch(0.9605 0.0046 258.32); /* #F0F2F5 */
+    --gray-100: rgb(238, 238, 238);
+    --gray-500: rgba(123, 123, 123, 1);
+    --gray-800: rgba(47, 43, 61, 0.9);
+  }
+
+  .dark {
+    --light-gray: oklch(31.671% 0.00768 264.498);
+    --gray-100: #1e1e1e;
+    --gray-500: rgba(160, 160, 160, 1);
+    --gray-800: rgba(245, 245, 245, 0.9);
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+    /* box-shadow: 0 0 1px 1px red; */
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* Keep each input's themed background when the browser autofills saved values.
+     Consumers with a different surface can override --autofill-background. */
+  input:autofill,
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    filter: none;
+    box-shadow: 0 0 0 1000px var(--autofill-background, var(--input)) inset !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--autofill-background, var(--input)) inset !important;
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+  }
+}
+
+button,
+label {
+  @apply cursor-pointer;
+}
+
+/* Custom scroll bar */
+._custom-scroll::-webkit-scrollbar {
+  inline-size: 4px;
+}
+
+._custom-scroll-x::-webkit-scrollbar {
+  block-size: 5px;
+}
+
+._custom-scroll-x::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+._custom-scroll-x::-webkit-scrollbar-thumb {
+  background-color: #cccccc70;
+  border-radius: 9999px;
+}
+
+._custom-scroll-x:hover::-webkit-scrollbar-thumb {
+  background-color: #999;
+}
+
+._custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+._custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #cccccc70;
+  border-radius: 9999px;
+}
+
+._custom-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: #999;
+}
+
+/* Scrollable but scrollbar hidden entirely */
+.no-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* =============================================================
+   FullCalendar v6 — theme override (scoped under .fc-theme-mep)
+   Maps FullCalendar's --fc-* vars onto our semantic tokens, then
+   refines events / today / "+N more" / popover with class selectors.
+   Plain top-level CSS (NOT inside @layer) so it wins over FC's
+   auto-injected stylesheet. Dark mode works via the tokens.
+   ============================================================= */
+.fc-theme-mep {
+  --fc-page-bg-color: var(--card);
+  --fc-border-color: var(--border);
+  --fc-neutral-bg-color: var(--muted);
+  --fc-neutral-text-color: var(--muted-foreground);
+  --fc-today-bg-color: color-mix(in oklch, var(--primary) 6%, transparent);
+  --fc-highlight-color: color-mix(in oklch, var(--primary) 10%, transparent);
+  --fc-now-indicator-color: var(--primary);
+  --fc-event-bg-color: color-mix(in oklch, var(--primary) 10%, var(--card));
+  --fc-event-border-color: var(--primary);
+  --fc-event-text-color: var(--foreground);
+  --fc-more-link-bg-color: transparent;
+  --fc-more-link-text-color: var(--muted-foreground);
+  --fc-small-font-size: 0.8125rem;
+
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+/* Outer frame — the wrapper already draws the rounded border */
+.fc-theme-mep .fc-scrollgrid {
+  border-top-width: 0;
+  border-left-width: 0;
+}
+.fc-theme-mep .fc-scrollgrid,
+.fc-theme-mep .fc-scrollgrid td,
+.fc-theme-mep .fc-scrollgrid th {
+  border-color: var(--border);
+}
+
+/* Weekday header — no border at all, so the header row sits flush against the
+   first day row with no visible seam, matching the legacy calendar. */
+.fc-theme-mep .fc-col-header-cell {
+  background: var(--card);
+  padding-block: 0.5rem;
+  border-bottom: none;
+}
+.fc-theme-mep .fc-col-header-cell-cushion {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Day cells + date numbers — 9/8 ratio (matches the legacy calendar's compact
+   rows), number centered. No overflow:hidden — it would clip multi-day
+   spanning event bars. The first row is slightly taller (9/7) to visually
+   absorb the header's now-invisible border, same as the legacy calendar. */
+.fc-theme-mep .fc-daygrid-day-frame {
+  aspect-ratio: 9 / 8;
+  min-height: 0;
+}
+.fc-theme-mep .fc-daygrid-body > table > tbody > tr:first-child .fc-daygrid-day-frame {
+  aspect-ratio: 9 / 7;
+}
+.fc-theme-mep .fc-daygrid-day-top {
+  justify-content: center;
+}
+.fc-theme-mep .fc-daygrid-day-number {
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+}
+.fc-theme-mep .fc-day-other .fc-daygrid-day-number {
+  color: var(--muted-foreground);
+  opacity: 0.7;
+}
+/* "today" — primary number, not bold, no circle, plus the legacy calendar's
+   primary top border on the day cell itself. */
+.fc-theme-mep .fc-day-today .fc-daygrid-day-number {
+  color: var(--primary);
+}
+.fc-theme-mep .fc-daygrid-day.fc-day-today {
+  border-block-start: 2px solid var(--primary);
+}
+
+/* Week/Day header — a subtle gray background (unlike Month's flush card
+   background), a bold day number under the weekday label, and a primary
+   underline + text color for today's column, matching the legacy calendar. */
+.fc-theme-mep .fc-timeGridWeek-view .fc-col-header-cell,
+.fc-theme-mep .fc-timeGridDay-view .fc-col-header-cell {
+  background: var(--muted);
+}
+.fc-theme-mep .fc-timeGridWeek-view .fc-col-header-cell.fc-day-today,
+.fc-theme-mep .fc-timeGridDay-view .fc-col-header-cell.fc-day-today {
+  border-block-end: 1px solid var(--primary);
+}
+.fc-theme-mep .fc-timeGridWeek-view .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion,
+.fc-theme-mep .fc-timeGridDay-view .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+  color: var(--primary);
+}
+
+/* Events — soft pink pill / bar */
+.fc-theme-mep .fc-event {
+  cursor: pointer;
+}
+.fc-theme-mep .fc-daygrid-event,
+.fc-theme-mep .fc-h-event,
+.fc-theme-mep .fc-v-event {
+  background: color-mix(in oklch, var(--primary) 10%, var(--card));
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.0625rem 0.375rem;
+  margin-block: 1px;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: background-color 0.15s ease;
+}
+/* hover -> primary background, primary-foreground text + dot (all views).
+   FC sets an explicit color on .fc-event-main, so !important is needed to win. */
+.fc-theme-mep .fc-event:hover {
+  background: var(--primary);
+}
+.fc-theme-mep .fc-event:hover,
+.fc-theme-mep .fc-event:hover .fc-event-main,
+.fc-theme-mep .fc-event:hover .fc-event-title,
+.fc-theme-mep .fc-event:hover .fc-event-time {
+  color: var(--primary-foreground) !important;
+}
+.fc-theme-mep .fc-event:hover .fc-mep-dot {
+  background-color: var(--primary-foreground);
+}
+.fc-theme-mep .fc-event:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* "+N more" link */
+.fc-theme-mep .fc-daygrid-more-link,
+.fc-theme-mep .fc-more-link {
+  cursor: pointer;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 0.375rem;
+}
+.fc-theme-mep .fc-daygrid-more-link:hover,
+.fc-theme-mep .fc-more-link:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+/* "+N more" popover — small card */
+.fc-theme-mep .fc-popover {
+  display: none !important; /* replaced by EventCalendarMorePopover */
+}
+
+/* timegrid (week / day) */
+.fc-theme-mep .fc-timegrid-axis-cushion,
+.fc-theme-mep .fc-timegrid-slot-label-cushion {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.fc-theme-mep .fc-timegrid-slot {
+  height: 2.5rem;
+}
+/* events fill the column width (FC reserves a 2.5% right gutter by default) */
+.fc-theme-mep .fc-timegrid-col-events {
+  margin: 0 2px;
+}
+/* timegrid "+N more" — contained per column so it doesn't overlap neighbours */
+.fc-theme-mep .fc-timegrid-more-link {
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  color: var(--primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.fc-theme-mep .fc-timegrid-more-link-inner {
+  padding: 1px 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fc-theme-mep .fc-timegrid-more-link:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Hide HTML5 input number spin buttons */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Disabled form state consistency */
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled,
+[data-disabled],
+fieldset:disabled label,
+fieldset:disabled input,
+fieldset:disabled select,
+fieldset:disabled textarea,
+fieldset:disabled button {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}

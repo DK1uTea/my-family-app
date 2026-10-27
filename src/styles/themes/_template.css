@@ -1,0 +1,42 @@
+/* =============================================================
+   TENANT TEMPLATE — copy this file, rename to <tenant>.css
+   Apply theme by adding class "theme-<tenant>" to <html>:
+     <html class="dark theme-acme">
+   ============================================================= */
+
+/* Light mode overrides */
+.theme-TENANT {
+  /* Brand primary */
+  --primary: oklch(/* ... */);
+  --primary-foreground: oklch(/* ... */);
+  --primary-hover: oklch(/* ... */);
+
+  /* Brand-specific surfaces */
+  --background-login: oklch(/* ... */);
+  --background-header: oklch(/* ... */);
+
+  /* Sidebar */
+  --sidebar: oklch(/* ... */);
+  --sidebar-primary: oklch(/* ... */);   /* active item */
+  --sidebar-accent: oklch(/* ... */);    /* hover item */
+
+  /* Radius — each component family is independently themeable. */
+  /* --button-radius: 2.5rem; */
+  /* --input-radius: 2.5rem; */
+  /* --input-group-radius: 2.5rem; */
+  /* --select-radius: 2.5rem; */
+  /* --textarea-radius: 0.5rem; */
+  /* --textarea-float-radius: 0.625rem; */
+  /* --input-float-radius: 0.625rem; */
+  /* --select-float-radius: 0.625rem; */
+  /* --editor-radius: 0.625rem; */
+  /* --date-picker-radius: 2.5rem; */
+  /* --detail-field-radius: 2.5rem; */
+  /* --choice-radius: 2.5rem; */
+  /* --sidebar-item-radius: 1.25rem; */
+}
+
+/* Dark mode overrides (only values that differ from light) */
+.dark.theme-TENANT {
+  --background-login: oklch(/* ... */);
+}
