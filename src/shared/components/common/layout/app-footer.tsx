@@ -41,6 +41,7 @@ const SOCIAL_LINKS = [
 
 export function AppFooter() {
   const t = useTranslations('footer')
+  const year = new Date().getFullYear()
   const { version, date } = parseAppVersion(process.env.NEXT_PUBLIC_VERSION)
 
   return (
@@ -82,7 +83,7 @@ export function AppFooter() {
 
         {/* Bottom: Copyright + Links */}
         <div className="flex flex-col-reverse items-center justify-between gap-5 text-[15px] font-light sm:flex-row font-brand-wide">
-          <p className="text-footer-foreground/50 order-1 md:order-0">{t('copyrightCocaCola')}</p>
+          <p className="text-footer-foreground/50 order-1 md:order-0">{t('copyrightCocaCola', { year })}</p>
           <div className="flex items-center gap-2 md:gap-8">
             <Link href="/support" className="text-footer-foreground underline-offset-4 transition-colors hover:text-primary hover:underline">
               {t('supportLink')}

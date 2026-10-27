@@ -1,0 +1,152 @@
+/* =============================================================
+   TENANT: Default  (default tenant — applied via :root / .dark)
+   ============================================================= */
+
+:root {
+  /* --- Typography --- */
+  --font-family-brand: 'CCEP Rhythm', system-ui, sans-serif;
+  --font-family-brand-narrow: 'CCEP Rhythm Narrow', 'CCEP Rhythm', system-ui, sans-serif;
+  --font-family-brand-wide: 'CCEP Rhythm Wide', 'CCEP Rhythm', system-ui, sans-serif;
+
+  /* --- Page background & default text --- */
+  --background: oklch(0.985 0.002 247.8);          /* #F9FAFB */
+  --foreground: oklch(0.148 0.004 285.8);          /* #1c1c1e */
+
+  /* --- Card / elevated surfaces --- */
+  --card: oklch(1 0 0);                            /* #ffffff */
+  --card-foreground: oklch(0.148 0.004 285.8);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.148 0.004 285.8);
+
+  /* --- Brand primary (red) --- */
+  --primary: oklch(0.608 0.249 28.7);              /* #F40009 */
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.637 0.214 25.2);        /* #F74F47 */
+
+  /* --- Secondary / Muted (neutral grays) --- */
+  --secondary: oklch(0.914 0.004 262.3);           /* #E5E6E8 */
+  --secondary-foreground: oklch(0.148 0.004 285.8);
+  --muted: oklch(0.914 0.004 262.3);               /* #E5E6E8 */
+  --muted-foreground: oklch(0.583 0 0);            /* #7B7B7B */
+  --accent: oklch(0.914 0.004 262.3);
+  --accent-foreground: oklch(0.148 0.004 285.8);
+
+  /* --- Semantic states --- */
+  --success: oklch(0.668 0.194 149.2);             /* #00B050 */
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.852 0.199 91.9);              /* #FACC15 */
+  --warning-foreground: oklch(0.421 0.095 57.7);   /* #713F12 */
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.944 0 0);                      /* #eeeeee */
+  --input: oklch(0.944 0 0);
+  --ring: oklch(0.637 0.214 25.2);                 /* #F74F47 — soft focus ring */
+
+  /* --- Brand-specific surfaces --- */
+  --background-header: oklch(1 0 0);               /* #ffffff */
+  --background-login: oklch(0.537 0.277 27.3);     /* #F40009 */
+
+  /* --- Sidebar (brand maroon — same in light & dark) --- */
+  --sidebar: oklch(0.342 0.168 350.1);             /* #76154B */
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.291 0.129 349.5);     /* #5F1D42 — active item */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.318 0.150 349.8);      /* hover state */
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: oklch(0.637 0.214 25.2);
+
+  /* --- Footer --- */
+  --footer: oklch(0.878 0 0);                        /* #DCDCDC */
+  --footer-foreground: oklch(0.148 0.004 285.8);     /* #1c1c1e */
+  --footer-icon: oklch(0.572 0 0);                   /* #878787 */
+  --footer-icon-bg: oklch(1 0 0);                    /* #FFFFFF */
+  --footer-icon-border: oklch(1 0 0);                /* #FFFFFF */
+
+  /* --- Charts --- */
+  --chart-1: oklch(0.537 0.277 27.3);
+  --chart-2: oklch(0.637 0.214 25.2);
+  --chart-3: oklch(0.342 0.168 350.1);
+  --chart-4: oklch(0.914 0.004 262.3);
+  --chart-5: oklch(0.436 0 0);
+  --chart-empty: oklch(0.973 0 0);                 /* #f6f6f6 */
+
+  /* --- Radius --- */
+  --radius: 0.5rem;                                /* 8px base */
+  --button-radius: 2.5rem;                         /* 40px — pill buttons */
+  --input-radius: 2.5rem;                          /* 40px — text inputs */
+  --input-group-radius: 2.5rem;                   /* 40px — grouped inputs */
+  --select-radius: 2.5rem;                         /* 40px — select triggers */
+  --textarea-radius: 0.5rem;                       /* 8px — multiline inputs */
+  --textarea-float-radius: 0.625rem;              /* 10px — floating textareas */
+  --input-float-radius: 0.625rem;                 /* 10px — floating inputs */
+  --select-float-radius: 0.625rem;                /* 10px — floating selects */
+  --editor-radius: 0.625rem;                      /* 10px — rich text editor */
+  --date-picker-radius: 2.5rem;                   /* 40px — date triggers */
+  --detail-field-radius: 2.5rem;                  /* 40px — read-only fields */
+  --choice-radius: 2.5rem;                        /* 40px — choice options */
+  --sidebar-item-radius: 2.5rem;                  /* 20px — sidebar nav items */
+}
+
+.dark {
+  /* --- Page background & default text --- */
+  --background: oklch(0.188 0 0);                  /* #1f1f1f */
+  --foreground: oklch(1 0 0);
+
+  /* --- Card / elevated surfaces --- */
+  --card: oklch(0.200 0.006 264.1);                /* #202124 */
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.200 0.006 264.1);
+  --popover-foreground: oklch(1 0 0);
+
+  /* --- Brand primary (red — unchanged across modes) --- */
+  --primary: oklch(0.608 0.249 28.7);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.637 0.214 25.2);
+
+  /* --- Secondary / Muted (dark grays) --- */
+  --secondary: oklch(0.268 0.007 264.3);           /* #303134 */
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.268 0.007 264.3);
+  --muted-foreground: oklch(0.715 0 0);            /* #A3A3A3 — adjusted for dark mode */
+  --accent: oklch(0.268 0.007 264.3);
+  --accent-foreground: oklch(1 0 0);
+
+  /* --- Semantic states --- */
+  --success: oklch(0.668 0.194 149.2);             /* #00B050 */
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.852 0.199 91.9);              /* #FACC15 */
+  --warning-foreground: oklch(0.421 0.095 57.7);   /* #713F12 */
+  --destructive: oklch(0.637 0.214 25.2);
+  --border: oklch(0.320 0.008 254.4);              /* #3c4043 */
+  --input: oklch(0.320 0.008 254.4);
+  --ring: oklch(0.637 0.214 25.2);
+
+  /* --- Brand-specific surfaces --- */
+  --background-header: oklch(0.200 0.006 264.1);   /* #202124 */
+  --background-login: oklch(0.145 0.065 27.3);     /* #240000 */
+
+  /* --- Sidebar (brand maroon — unchanged in dark) --- */
+  --sidebar: oklch(0.342 0.168 350.1);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.291 0.129 349.5);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.318 0.150 349.8);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.637 0.214 25.2);
+
+  /* --- Footer --- */
+  --footer: oklch(0.145 0.065 27.3);                /* #240000 */
+  --footer-foreground: oklch(1 0 0);                /* #FFFFFF */
+  --footer-icon: oklch(0.572 0 0);                  /* #878787 */
+  --footer-icon-bg: oklch(0.145 0.065 27.3);        /* #240000 */
+  --footer-icon-border: oklch(0.145 0.065 27.3);    /* #240000 */
+
+  /* --- Charts --- */
+  --chart-1: oklch(0.637 0.214 25.2);
+  --chart-2: oklch(0.537 0.277 27.3);
+  --chart-3: oklch(0.342 0.168 350.1);
+  --chart-4: oklch(0.449 0.012 256.7);             /* #5f6368 */
+  --chart-5: oklch(0.268 0.007 264.3);
+  --chart-empty: oklch(0.268 0.007 264.3);
+}
