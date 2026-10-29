@@ -1,9 +1,13 @@
 [mcp_servers.playwright]
 command = "npx"
 args = [
-    "-y",
-    "@playwright/mcp@latest",
-    "--isolated",
-    "--browser",
-    "chrome",
+  "-y",
+  "@playwright/mcp@latest",
+  "--isolated",
+  "--browser",
+  "chrome"
 ]
+
+[mcp_servers.Neon]
+type = "http"
+url = "https://mcp.neon.tech/mcp?projectId=calm-voice-34721495"

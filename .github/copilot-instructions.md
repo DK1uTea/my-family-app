@@ -2,7 +2,7 @@
 
 > **Two rules override everything below.**
 >
-> 1. **QA owns every test case; dev owns implementation only.** If you are doing dev work, never create, edit, or delete a `*.test.ts(x)` or `*.spec.ts` file — implement against `docs/specs/<module>.md` and flag anything wrong with an existing test back to QA. If you are doing QA/test work, never edit a file under `src/` — write/update the test case instead. → `.claude/skills/test-driven-development/SKILL.md`
+> 1. **QA owns every test case; dev owns implementation only.** If you are doing dev work, never create, edit, or delete a `*.test.ts(x)` or `*.spec.ts` file — implement against the approved module spec and flag anything wrong with an existing test back to QA. If you are doing QA/test work, never edit implementation source under `src/`; backend module `SPEC.md` files are documentation and may be updated by QA. → `.claude/skills/test-driven-development/SKILL.md`
 > 2. **Every rule change fans out to every agent's rule file, in the same change.** A rule that only lands in one file is a rule the other half of the team's agents will violate. → `.claude/skills/agent-rules-sync/SKILL.md`
 
 ---
@@ -28,11 +28,11 @@ Before ending a turn that touched a rule: grep the new wording across `CLAUDE.md
 
 Non-trivial work follows this route. The map lives in `.claude/skills/feature-workflow/SKILL.md`; read it when you are unsure which stage applies.
 
-**Test authorship is not a dev step.** Dev implements against the approved spec and never touches a test file. QA writes and maintains every test case — unit/component and E2E — and never touches a file under `src/`. The two work in parallel off the same spec, not one after the other. Full split, including "which role am I": `.claude/skills/test-driven-development/SKILL.md`.
+**Test authorship is not a dev step.** Dev implements against the approved spec and never touches a test file. QA writes and maintains every test case — unit/component and E2E — and never edits implementation source under `src/`; backend module `SPEC.md` files are the documentation-only exception. The two work in parallel off the same spec, not one after the other. Full split, including "which role am I": `.claude/skills/test-driven-development/SKILL.md`.
 
 | Stage | Skill | Gate before advancing |
 | ----- | ----- | --------------------- |
-| **SPEC** | `spec-driven-development` | Human approved `docs/specs/<feature>.md` |
+| **SPEC** | `spec-driven-development` | Human-approved spec: UI `docs/specs/<feature>.md`; backend `src/server/modules/<domain>/SPEC.md` |
 | **DEV** (parallel with QA) | `test-driven-development` | `pnpm test`, `pnpm typecheck`, `pnpm lint` pass against existing QA test cases |
 | **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | Every behaviour bullet has a test case that failed for the right reason first |
 | **VERIFY** | `browser-verification-playwright` | Console clean, both locales, `pnpm test:e2e` passes |
@@ -77,6 +77,8 @@ the RED-to-GREEN workflow.
 | `accessibility`                    | **Any interactive JSX** — labels, names, keyboard, focus, contrast    |
 | `agent-rules-sync`                 | **Any rule, skill, script or MCP change** — fans it out to every agent |
 | `nextjs-new-module`                | New top-level sidebar entry (read it in full, follow it in order)     |
+| `neon` | Neon project setup, CLI/MCP, and Neon services |
+| `neon-postgres` | Neon Postgres connections, SQL, schema, migrations, and diagnostics |
 
 **Pattern skills** live in `.omc/skills/` and are mirrored as slash commands in `.claude/commands/` — update both copies together. They cover components, data fetching, forms, URL state, i18n, tabs, colors and buttons.
 
@@ -84,7 +86,7 @@ the RED-to-GREEN workflow.
 
 ## Testing — Mandatory, Owned by QA
 
-**QA owns every test case — unit/component (Vitest) and E2E (Playwright) alike.** Dev implements against `docs/specs/<module>.md` and never creates, edits, or deletes a test file; QA never edits a file under `src/`. Every behaviour change still requires a failing test first — it is just QA's test, not dev's. No exceptions unless the human explicitly says to skip. Full rules, including the role split, in `.claude/skills/test-driven-development/SKILL.md`.
+**QA owns every test case — unit/component (Vitest) and E2E (Playwright) alike.** Dev implements against the approved module spec and never creates, edits, or deletes a test file; QA never edits implementation source under `src/`; it may update `src/server/modules/<domain>/SPEC.md` as documentation only. Every behaviour change still requires a failing test first — it is just QA's test, not dev's. No exceptions unless the human explicitly says to skip. Full rules, including the role split, in `.claude/skills/test-driven-development/SKILL.md`.
 
 | Kind | Location | Extension | Runner |
 | ---- | -------- | --------- | ------ |
@@ -151,7 +153,7 @@ e2e/
 
 **Only `login`'s own flow spec walks the real login form.** Every other module's flow spec authenticates via `resumeSessionAt` (a direct API call) — never `signIn` (the UI form). The login form's own locale/redirect behavior is unrelated to what any other module's flow is testing, and rendering it first only adds time and a second source of flakiness.
 
-Describe a module in `docs/specs/<module>.md` (template: `docs/specs/_TEMPLATE.module.md`) and group the happy-path "Behaviour" bullets by flow — each group becomes one spec file's test names. Scaffold with `pnpm e2e:new <module>`.
+For UI modules, describe behavior in `docs/specs/<module>.md` (template: `docs/specs/_TEMPLATE.module.md`) and group happy-path "Behaviour" bullets by flow. Backend behavior belongs in `src/server/modules/<domain>/SPEC.md`. Scaffold UI E2E folders with `pnpm e2e:new <module>`.
 
 **Every spec hits the real backend — there is no `page.route()` mocking.** This only works because `SKIP_CAPTCHA_VERIFICATION=true` (see `src/lib/verify-captcha.ts`) is double-gated behind `NODE_ENV !== 'production'` and set in `.env.local`: the frontend still executes reCAPTCHA v3 and sends a token, but the backend's score check is skipped, so a headless browser's low bot-likelihood score never gets a real, correct login rejected. A branch a fresh sign-in cannot reach (a locked account, an inactive account, one restricted to specific modules) needs a **dedicated real test account** supplied via `.env.local` (see `.env.example`), read through `lockedCredentials()` / `inactiveCredentials()` / `restrictedCredentials()` in `e2e/shared/session.ts` — each returns `null` when unconfigured, and the test skips itself with a stated reason rather than fail or fall back to a fixture. **Accepted risk:** a wrong-password test spends one of the real five attempts the backend tracks and can lock the account after five in a row — that is the trade-off of a real backend, not a bug to fix.
 
@@ -206,6 +208,7 @@ Runtime checks use `@axe-core/playwright` via `scanA11y` (`e2e/shared/a11y.ts`).
 | Server | Declared in | Purpose |
 | ------ | ----------- | ------- |
 | `playwright` | `.vscode/mcp.json` (VS Code / Copilot agent mode) + `.mcp.json` (Claude Code) | Drive a real browser to reproduce, inspect and verify UI changes |
+| `Neon` | `.mcp.json` + `.vscode/mcp.json` | Manage the linked Neon project and Postgres service through OAuth |
 
 Both run `npx -y @playwright/mcp@latest --isolated --browser chrome`. The dev server is **not** started for you in an MCP session — run `pnpm dev` first and drive `http://localhost:3000`. Every path needs its locale prefix (`/de/login`). Workflow in `.claude/skills/browser-verification-playwright/SKILL.md`.
 
@@ -275,6 +278,17 @@ import toast from 'react-hot-toast'; // WRONG
 ---
 
 ## Architecture
+
+First-party API request flow is Route Handler -> `src/server/modules/<domain>` service ->
+`src/server/layer-data/<domain>` repository contract/Drizzle adapter -> shared Drizzle client
+-> Neon. Route Handlers own HTTP concerns; services own use cases; neither queries Drizzle
+directly. Compose with TypeScript factories, not NestJS. Drizzle schemas live in
+`src/server/drizzle/schema/` and migrations in
+`src/server/drizzle/migrations/`.
+
+Drizzle setup commands: `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:push`, `pnpm db:studio`. API docs are served at `/api/docs` with the
+
+source document at `/api/openapi.json`.
 
 ### Directory Structure
 
@@ -612,9 +626,7 @@ Backend error codes live under the **`errors`** namespace and are resolved via `
 |----------|----------|-------------|
 | `apiProxy` (named, only export) | `/api` | All API calls — auth (login, refresh-token, clear-cookies) and every other regular API call |
 
-**All calls route through the Next.js server, never straight to the backend.** Requests hit either a dedicated Next.js route handler (`src/app/api/auth/...`) or the catch-all proxy `src/app/api/[...path]/route.ts`, which forwards server-side to the real backend (core/trade-fair/cam/etr/notification) based on the path's module prefix — `core` is just another module, handled by the same catch-all as `tf`/`cam`/`etr`/`notification`. This lets the backend live on an internal-only network reachable from the Next server but not from the browser. Add a new backend module by adding an entry to `MODULE_PREFIXES` in `src/app/api/[...path]/route.ts` — no new client needed.
-
-Some realtime flows (CAM chat Socket.IO, notification SSE) and one registration upload flow still call `NEXT_PUBLIC_API_BASE_URL` directly from the browser — a known exception, not the pattern for new code.
+**Browser API calls use same-origin Next.js routes by default.** A request either reaches a dedicated Route Handler that calls a first-party server module, or the existing catch-all proxy forwards a legacy endpoint to the external API. New first-party endpoints use the single `/api/v1/<domain>/...` namespace; do not add `/core`, `/etr`, or other service prefixes. Keep existing external proxy mappings only for endpoints that have not migrated. A few legacy realtime/upload flows still call `NEXT_PUBLIC_API_BASE_URL` directly; do not copy that pattern into new code.
 
 ---
 
@@ -650,7 +662,7 @@ import { TabsUrl } from '@/shared/components/ui/tabs-url';
 ## What NOT to Do
 
 - ❌ Dev creating, editing, or deleting a `*.test.ts(x)` or `*.spec.ts` file — flag it back to QA instead
-- ❌ QA editing a file under `src/` to make a test pass — that's a bug report back to dev
+- ❌ QA editing implementation source under `src/` to make a test pass — that's a bug report back to dev
 - ❌ Fixing a bug without a QA reproduction test, without saying that coverage is pending
 - ❌ Changing the implementation and then "fixing up" the tests to match — always QA's call, never dev's
 - ❌ `test.skip`, `it.skip`, or deleting a failing test to get a green run

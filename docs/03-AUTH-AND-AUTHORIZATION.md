@@ -9,6 +9,11 @@
 
 Both the AT and RT are **never readable by JavaScript (`httpOnly: true`)** — this completely prevents XSS token theft. The browser automatically sends the cookies to Next.js route handlers (`/api/*`) via `withCredentials: true`. The Next.js catch-all proxy (`src/app/api/[...path]/route.ts`) reads the `accessToken` cookie on the server and attaches `Authorization: Bearer <AT>` before forwarding to the real backend.
 
+This describes the current frontend/external-backend integration. The first-party auth
+API is planned but not implemented yet; its module contract is
+[`src/server/modules/auth/SPEC.md`](../src/server/modules/auth/SPEC.md). Update this page
+when the auth migration changes the token or cookie contract.
+
 ## Route Guard (`src/proxy.ts`)
 
 In Next.js 16, `proxy.ts` is the middleware entry point directly.

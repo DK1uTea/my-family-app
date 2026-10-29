@@ -21,8 +21,9 @@ architecture, the styling and i18n conventions, the defensive-data-rendering rul
 
 Test authorship is a role, not a step in the dev loop. **QA writes and maintains every
 test case — unit/component (Vitest) and E2E (Playwright) alike.** Dev implements against
-`docs/specs/<module>.md` and **never creates, edits, or deletes a `*.test.ts(x)` or
-`*.spec.ts` file.** QA **never edits a file under `src/`.** The two work in parallel off the
+the approved module spec and **never creates, edits, or deletes a `*.test.ts(x)` or
+`*.spec.ts` file.** QA never edits implementation source under `src/`; backend module
+`src/server/modules/<domain>/SPEC.md` files are documentation and may be updated by QA. The two work in parallel off the
 same approved spec — dev does not wait for QA's test files to exist first.
 
 Which role applies depends on what the task asks for, not on who is typing — asked to
@@ -91,7 +92,7 @@ Dev and QA run in parallel off the same approved spec, not sequentially.
 
 | Stage | Skill | Gate before advancing |
 | ----- | ----- | --------------------- |
-| **SPEC** | `spec-driven-development` | Human approved `docs/specs/<feature>.md` |
+| **SPEC** | `spec-driven-development` | Human-approved spec: UI `docs/specs/<feature>.md`; backend `src/server/modules/<domain>/SPEC.md` |
 | **DEV** (parallel with QA) | `test-driven-development` | `pnpm test`, `pnpm typecheck`, `pnpm lint` pass against existing QA test cases |
 | **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | Every behaviour bullet has a test case that failed for the right reason first |
 | **VERIFY** | `browser-verification-playwright` | Console clean, both locales, `pnpm test:e2e` passes |
@@ -116,6 +117,8 @@ Map and definition of done: `.claude/skills/feature-workflow/SKILL.md`
 | `accessibility` | Any interactive JSX — labels, names, keyboard, focus, contrast |
 | `agent-rules-sync` | Any rule, skill, script or MCP change |
 | `nextjs-new-module` | New top-level sidebar entry — read in full, follow in order |
+| `neon` | Neon project setup, CLI/MCP, and Neon services |
+| `neon-postgres` | Neon Postgres connections, SQL, schema, migrations, and diagnostics |
 
 Pattern skills for components, data fetching, forms, URL state, i18n, tabs, colors and
 buttons live in `.omc/skills/`, mirrored as slash commands in `.claude/commands/`.
@@ -185,9 +188,10 @@ flow.** A module with one flow (e.g. `login`) gets one file; a module with genui
 separate journeys (e.g. `events` — create vs. edit) gets one file per journey. Small team,
 optimizing for locking down working business behaviour with minimum maintenance — not
 exhaustive UI coverage. Field-level validation and mapper guards belong in Vitest unit tests
-instead. Describe a module in `docs/specs/<module>.md` (template
-`docs/specs/_TEMPLATE.module.md`) and group the happy-path "Behaviour" bullets by flow — each
-group becomes one spec file. Scaffold with `pnpm e2e:new <module>`. Each flow spec creates
+instead. For UI modules, describe behavior in `docs/specs/<module>.md` (template
+`docs/specs/_TEMPLATE.module.md`) and group happy-path behavior bullets by flow. Backend
+behavior belongs in `src/server/modules/<domain>/SPEC.md`. Scaffold UI E2E folders with
+`pnpm e2e:new <module>`. Each flow spec creates
 whatever data it needs itself — never depend on another spec file's leftover state — and
 every flow spec authenticates via `resumeSessionAt`, except `login`'s own flow spec, which is
 the one place the real UI form is exercised on purpose.
@@ -242,11 +246,23 @@ Three traps that bite every newcomer:
 | Server | Declared in | Purpose |
 | ------ | ----------- | ------- |
 | `playwright` | `.mcp.json` + `.vscode/mcp.json` | Drive a real browser to reproduce, inspect and verify UI changes |
+| `Neon` | `.mcp.json` + `.vscode/mcp.json` | Manage the linked Neon project and Postgres service through OAuth |
 
 Runs `npx -y @playwright/mcp@latest --isolated --browser chrome`. Start `pnpm dev` yourself
 before an MCP session. Every path needs its locale prefix: `/de/login`, `/en/dashboards`.
 
 ## Hard Constraints
+
+First-party API request flow is Route Handler -> `src/server/modules/<domain>` service ->
+`src/server/layer-data/<domain>` repository contract/Drizzle adapter -> shared Drizzle client
+-> Neon. Route Handlers own HTTP concerns; services own use cases; neither queries Drizzle
+directly. Compose with TypeScript factories, not NestJS. Drizzle schemas live in
+`src/server/drizzle/schema/` and migrations in
+`src/server/drizzle/migrations/`.
+
+Use `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:push`, and `pnpm db:studio` for Drizzle tasks. API docs are at
+
+`/api/docs`; the OpenAPI source endpoint is `/api/openapi.json`.
 
 The full list is in `CLAUDE.md`. These are the ones that break the build or the app:
 
@@ -265,3 +281,13 @@ The full list is in `CLAUDE.md`. These are the ones that break the build or the 
 
 State what you ran and what it said. "Tests pass" with no output is not a result. If you
 skipped a stage, name it and say why — silence reads as an omission.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

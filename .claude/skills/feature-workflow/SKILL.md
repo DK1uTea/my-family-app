@@ -55,15 +55,20 @@ When in doubt, spend the 15 minutes on a spec. Skipping it is the expensive mist
 
 The task tells you the lane — see "Which Role Am I" in
 `.claude/skills/test-driven-development/SKILL.md` for the full table. Short version: asked
-to implement/fix/refactor → dev, touch `src/` only, never a test file. Asked to write/update
-test cases or coverage → QA, touch test files only, never `src/`.
+to implement/fix/refactor → dev, touch implementation source only, never a test file. Asked
+to write/update test cases or coverage → QA, touch test files and the applicable spec only;
+QA never edits implementation source. A backend module's `SPEC.md` is the documentation
+exception because it lives under `src/server/modules/`.
 
 ## Stage 1 — SPEC
 
 → `.claude/skills/spec-driven-development/SKILL.md`
 
 List your assumptions, get them corrected, reframe anything vague into testable criteria,
-write `docs/specs/<feature>.md`, and get the human's yes before writing code.
+write the spec in its canonical home, and get the human's yes before writing code. UI
+feature specs live in `docs/specs/<feature>.md`; backend domain specs live beside their
+module at `src/server/modules/<domain>/SPEC.md`; cross-cutting backend specs live at
+`src/server/SPEC.md`.
 
 **Gate:** the human approved the spec. The behaviour bullets in it are QA's test names and
 dev's implementation checklist — the same list, two owners.
@@ -77,7 +82,7 @@ files to exist:
 
 ```
 DEV (per behaviour in the spec):
-    implement           → against docs/specs/<feature>.md, no test files touched
+    implement           → against the approved module spec, no test files touched
     self-check          → pnpm test / pnpm test:e2e against whatever QA has so far
     flag, don't fix     → any test that looks wrong or stale goes back to QA
 
@@ -139,7 +144,7 @@ Fan out everything that has more than one home:
 Not done until every one of these is true:
 
 - [ ] The spec exists and matches what was actually built
-- [ ] Dev touched no test file; QA touched no file under `src/`
+- [ ] Dev touched no test file; QA touched no implementation source under `src/`
 - [ ] Every behaviour has a QA test case — present, or explicitly named as pending
 - [ ] `pnpm test` passes — output shown, not asserted from memory
 - [ ] `pnpm typecheck` passes

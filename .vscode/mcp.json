@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--isolated", "--browser", "chrome"]
+    },
+    "Neon": {
+      "type": "http",
+      "url": "https://mcp.neon.tech/mcp?projectId=calm-voice-34721495"
+    }
+  }
+}

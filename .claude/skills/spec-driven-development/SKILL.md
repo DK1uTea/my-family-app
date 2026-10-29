@@ -80,8 +80,14 @@ REFRAMED:
 
 ### Where specs live
 
-`docs/specs/<feature-name>.md`, committed alongside the code. The `docs/` folder already
-holds this project's architecture documents; specs sit under it in their own folder.
+Keep the spec with the code it describes:
+
+- UI and frontend feature specs: `docs/specs/<feature-name>.md`.
+- Backend domain specs: `src/server/modules/<domain>/SPEC.md`, beside the module.
+- Cross-cutting backend architecture: `src/server/SPEC.md`.
+
+Commit the spec alongside the implementation. For backend modules, `SPEC.md` is a
+documentation file colocated with source; it is not implementation code or a test file.
 
 ### Spec template
 
@@ -126,7 +132,7 @@ Each user-visible behaviour as a bullet. These become test names verbatim.
   case (unit + e2e) in parallel; update en.json + de.json together; run pnpm test before done
 - Ask first: new dependency, new backend module prefix, schema-shaped API change
 - Never: commit secrets, skip a failing test, hardcode strings or colors in JSX, dev editing
-  a test file, QA editing a file under `src/`
+  a test file, QA editing implementation source under `src/`
 
 ## Success Criteria
 Specific, testable conditions. If you cannot write a test for it, it is not a criterion.
@@ -227,7 +233,9 @@ makes the next person's change safe.
 
 - [ ] Assumptions were listed and the human corrected or confirmed them
 - [ ] Vague requirements were reframed into testable criteria
-- [ ] The spec is saved under `docs/specs/` and committed
+- [ ] The spec is saved in the correct home (UI: `docs/specs/`; backend domain:
+      `src/server/modules/<domain>/SPEC.md`; cross-cutting server: `src/server/SPEC.md`)
+      and committed
 - [ ] In-scope **and** out-of-scope are both written down
 - [ ] Every behaviour bullet maps to a planned test
 - [ ] Boundaries (Always / Ask first / Never) are defined

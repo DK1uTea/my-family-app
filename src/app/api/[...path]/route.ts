@@ -1,8 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { CORE_API_URL, getApiUrl } from "@/lib/constant";
-
-// Microservice / module prefix routing (extend if backend is split into multiple services)
-const MODULE_PREFIXES: Record<string, string> = {};
+import { API_URL } from "@/lib/constant";
 
 function normalizeLocale(locale: unknown) {
   if (typeof locale !== "string") return undefined;
@@ -64,16 +61,12 @@ async function handler(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
-  const modulePrefix = path[0];
-  const moduleBaseUrl = MODULE_PREFIXES[modulePrefix];
-  const [baseUrl, targetPath] = moduleBaseUrl
-    ? [moduleBaseUrl, path.slice(1).join("/")]
-    : [CORE_API_URL, path.join("/")];
+  const targetPath = path.join("/");
 
   const searchParams = req.nextUrl.searchParams.toString();
   const targetUrl = searchParams
-    ? `${baseUrl}/${targetPath}?${searchParams}`
-    : `${baseUrl}/${targetPath}`;
+    ? `${API_URL}/${targetPath}?${searchParams}`
+    : `${API_URL}/${targetPath}`;
 
   // Build a minimal header set instead of forwarding the browser's raw headers
   // verbatim (Cookie, Accept-Encoding, sec-fetch-*, Referer, ...) — devtunnels

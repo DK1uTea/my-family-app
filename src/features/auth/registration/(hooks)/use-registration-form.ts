@@ -6,14 +6,14 @@ import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { registrationSchema, type RegistrationFormData } from '../(helpers)/registration-schema'
-import { getApiUrl } from '@/lib/constant'
+import { API_URL } from '@/lib/constant'
 
 type Props = {
   email: string
   code: string
 }
 
-const API_BASE = getApiUrl('core')
+const API_BASE = API_URL
 
 function base64ToBlob(dataUrl: string): Blob {
   const [header, base64] = dataUrl.split(',')

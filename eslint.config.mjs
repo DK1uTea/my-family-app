@@ -17,6 +17,7 @@ const eslintConfig = [
   {
     ignores: [
       '.claude/worktrees/**',
+      'public/**',
       // Generated artifacts — Playwright's HTML report bundles vendor JS that trips
       // dozens of rules and would otherwise break `pnpm lint` after every E2E run.
       'playwright-report/**',

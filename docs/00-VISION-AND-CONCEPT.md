@@ -8,12 +8,18 @@
 
 ## Architecture Overview
 
-This application is a **multi-tenant, multi-locale enterprise dashboard** frontend. Built as a high-performance **Client-Side Rendered (CSR) SPA** embedded inside Next.js App Router, providing:
+This application is a **multi-tenant, multi-locale enterprise dashboard** built as one
+full-stack Next.js App Router app. Its UI is primarily client-rendered; its server-side
+Route Handlers and domain modules live in this same repository. Existing external API
+proxy routes remain during migration, while new first-party API modules use the same Next
+runtime.
+
+The app provides:
 
 - **Tenant theming** — Each tenant ships its own CSS token set (brand colors, typography, radius) without touching component logic.
 - **Locale-first routing** — Every URL carries an explicit locale prefix (`/de/…`, `/en/…`). Locale is the single source of truth for language.
 - **URL-as-state** — All filter, pagination, and search state lives in the URL via `nuqs`, making every view deep-linkable and shareable.
-- **Direct data layer** — Feature hooks call the backend via TanStack Query + Axios; no intermediate code-generation boilerplate.
+- **Direct data layer** — Feature hooks call same-origin API routes via TanStack Query + Axios; Route Handlers either proxy the existing external API or call a first-party server module.
 - **Consistent error contract** — Backend errors resolve to translated messages through the `errors` namespace in `messages/en.json` / `de.json`.
 - **Design system agnostic pages** — Features only consume semantic tokens and shared primitives, allowing instant theme swapping.
 

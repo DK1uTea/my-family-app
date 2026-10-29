@@ -31,7 +31,9 @@ The old model had dev write the failing test and the implementation in the same 
 adjusting the test scenario as understanding of the flow evolved. In practice that let the
 test drift to match whatever the code ended up doing, instead of staying an independent
 check written from the spec. Splitting authorship keeps the test honest: it is written from
-`docs/specs/<module>.md`, not from reading the implementation that's supposed to satisfy it.
+the approved module spec, not from reading the implementation that's supposed to satisfy it.
+Frontend specs live in `docs/specs/<feature>.md`; backend domain specs live beside the
+server module at `src/server/modules/<domain>/SPEC.md`.
 
 ## The New Flow
 
@@ -51,7 +53,7 @@ check written from the spec. Splitting authorship keeps the test honest: it is w
 Dev and QA work **in parallel off the same spec**, not sequentially: as soon as a task is
 picked up, QA starts defining/updating its test cases while dev starts implementing. Dev
 does not wait for QA's test files to exist before writing code — dev codes straight from
-`docs/specs/<module>.md`. Once dev's implementation is ready, dev runs whatever test cases
+the approved module spec. Once dev's implementation is ready, dev runs whatever test cases
 QA has produced so far (`pnpm test`, `pnpm test:e2e`) to self-check before handing off; QA
 runs the full E2E pass for real afterwards, once the branch is deployed to an environment
 they can drive.
@@ -63,8 +65,12 @@ message and test work in the next. **Read the request, not the org chart:**
 
 | The task asks you to… | You are in… | You may write/edit | You must NOT write/edit |
 |---|---|---|---|
-| Implement a feature, fix a bug, change behaviour, refactor | **Dev role** | Source under `src/`, `docs/specs/*.md` | `tests/**/*.test.ts(x)`, `e2e/modules/**/*.spec.ts` |
-| Write/update test cases, add coverage, turn a spec into tests | **QA / Test role** | `tests/**/*.test.ts(x)`, `e2e/modules/**/*.spec.ts`, `docs/specs/*.md` | Anything under `src/` |
+| Implement a feature, fix a bug, change behaviour, refactor | **Dev role** | Source under `src/`, applicable spec | `tests/**/*.test.ts(x)`, `e2e/modules/**/*.spec.ts` |
+| Write/update test cases, add coverage, turn a spec into tests | **QA / Test role** | `tests/**/*.test.ts(x)`, `e2e/modules/**/*.spec.ts`, applicable spec | Implementation source under `src/` |
+
+For backend modules, QA may edit only `src/server/modules/<domain>/SPEC.md` when updating
+the behavior contract. This is the documentation exception to the rule that QA never edits
+implementation source under `src/`; QA still does not edit `.ts` or `.tsx` source files.
 
 If a request is ambiguous about which role applies, ask — don't default to "just do both."
 
@@ -75,7 +81,7 @@ even to fix an obviously broken selector, even to make the suite green, even if 
 exists yet for the behaviour you're building. Options when you hit a test problem:
 
 - **No test exists yet for this behaviour** — implement straight from
-  `docs/specs/<module>.md`. Do not write a placeholder or scratch test to drive your own
+  approved module spec. Do not write a placeholder or scratch test to drive your own
   work; that becomes an informal test case nobody asked you to own, and it competes with
   whatever QA will write. Verify manually (typecheck, lint, a manual run, Playwright MCP for
   UI) and say plainly that automated coverage is pending from QA.
@@ -94,14 +100,15 @@ same as authoring or editing them.
 
 ## QA / Test Role — Own Every Test Case, Don't Touch Implementation
 
-**Never edit a file under `src/` while acting as QA**, even a one-line fix that would make
-a test pass. If the implementation is wrong, that's a bug report back to dev, not something
-to patch on the way to a green run.
+**Never edit implementation source under `src/` while acting as QA**, even a one-line fix
+that would make a test pass. The only `src/` exception is the backend module's
+`src/server/modules/<domain>/SPEC.md`, which QA may update as documentation when the
+behavior contract changes. If implementation is wrong, report it to dev.
 
 - Write and maintain both tiers: Vitest unit/component tests under `tests/`, and Playwright
   E2E specs under `e2e/modules/<module>/` — see `.claude/skills/e2e-module-testing/SKILL.md`
   for the E2E layout and workflow.
-- Source test cases from `docs/specs/<module>.md` — every "Behaviour" bullet becomes a test
+- Source test cases from the approved module spec — every behavior bullet becomes a test
   name. If the spec is missing or a bullet can't become a concrete assertion, that's a
   question back to the human, not a guess.
 - You may run the app / dev server to observe real behaviour (`browser-verification-playwright`
@@ -381,7 +388,7 @@ promote what you verified into a durable `e2e/*.spec.ts`.
 ## Red Flags
 
 - Dev creating, editing, or deleting any `*.test.ts(x)` or `*.spec.ts` file
-- QA editing any file under `src/` to make a test pass
+- QA editing implementation source under `src/` to make a test pass
 - Writing implementation code with no spec and no existing test to aim at
 - A test that passed the first time it ran
 - Claiming "all tests pass" without a command's output to show for it
@@ -402,14 +409,14 @@ pending.
 
 ### Dev role
 - [ ] No `*.test.ts(x)` or `*.spec.ts` file was created, edited, or deleted
-- [ ] Implementation follows `docs/specs/<module>.md`, not a guess
+- [ ] Implementation follows the approved module spec, not a guess
 - [ ] `pnpm test` and `pnpm test:e2e` were run (not authored) against existing QA test cases, output shown
 - [ ] `pnpm typecheck` and `pnpm lint` pass
 - [ ] Any test that looked wrong, stale, or contradicted the spec was flagged back to QA, not edited
 - [ ] Behaviour with no QA test case yet is named explicitly as pending coverage
 
 ### QA / test role
-- [ ] No file under `src/` was created, edited, or deleted
+- [ ] No implementation source under `src/` was created, edited, or deleted by QA
 - [ ] Every "Behaviour" bullet in the spec has a matching test name
 - [ ] Each new/updated test was confirmed to fail for the right reason before implementation existed or was expected to satisfy it
 - [ ] Test names describe the behaviour, not the function name

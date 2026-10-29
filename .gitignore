@@ -18,6 +18,8 @@
 # next.js
 /.next/
 /out/
+/public/swagger-ui/
+/src/server/third-party/prisma/generated/
 
 # production
 /build
@@ -58,3 +60,4 @@ REACTIVE_ORDER_FLOW.md
 /testcase
 
 # old
+.neon

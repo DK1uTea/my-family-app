@@ -21,8 +21,8 @@ Route guard: `src/proxy.ts` treats a request as authenticated when either
 ```text
 LoginForm
   -> POST /api/auth/login
-  -> Next route validates captcha and calls core /auth/login
-  -> Next route calls core /user/me for language/theme
+  -> Next route validates captcha and calls upstream /api/v1/auth/login
+  -> Next route calls upstream /api/v1/user/me for language/theme
   -> cookies are set (access, refresh, locale, appearance)
   -> private layout mounts AppInitializer
   -> GET /api/user/me
@@ -74,9 +74,9 @@ POST /api/auth/verify-invite-user
   -> validate invite
   -> POST /api/auth/accept-invite
   -> POST /api/auth/registration-token
-  -> optional GET core /user/presigned-upload-url
+  -> optional GET /api/v1/user/presigned-upload-url
   -> optional PUT image to object storage
-  -> optional PATCH core /user/avatar
+  -> optional PATCH /api/v1/user/avatar
   -> return to login
 ```
 
@@ -99,18 +99,18 @@ reset form -> POST /api/auth/reset-password
 
 | Trigger | Browser call | Actual destination | Source |
 | --- | --- | --- | --- |
-| Current user | `GET /api/user/me` | core `/user/me` | `(hooks)/use-me.ts` |
-| Login | `POST /api/auth/login` | Next handler -> core `/auth/login` | `login/(hooks)/use-login-form.ts` |
-| Forgot password | `POST /api/auth/forgot-password` | Next handler -> core auth endpoint | `forgot-password/(hooks)/use-forgot-password-form.ts` |
-| Verify reset | `GET /api/auth/verify-reset-token` | core | `reset-password/(hooks)/use-verify-reset-token.ts` |
-| Reset password | `POST /api/auth/reset-password` | core | `reset-password/(hooks)/use-reset-password-form.ts` |
-| Verify invite | `POST /api/auth/verify-invite-user`, body `{code}` | Next handler -> core `/user/verify-invite-user` | `registration/(hooks)/use-verify-invite.ts` |
-| Registration presign | `GET core /user/presigned-upload-url` | direct backend | `registration/(hooks)/use-registration-form.ts` |
+| Current user | `GET /api/user/me` | external API `/api/v1/user/me` | `(hooks)/use-me.ts` |
+| Login | `POST /api/auth/login` | Next handler -> `/api/v1/auth/login` | `login/(hooks)/use-login-form.ts` |
+| Forgot password | `POST /api/auth/forgot-password` | Next handler -> `/api/v1/auth/forgot-password` | `forgot-password/(hooks)/use-forgot-password-form.ts` |
+| Verify reset | `GET /api/auth/verify-reset-token` | `/api/v1/auth/verify-reset-token` | `reset-password/(hooks)/use-verify-reset-token.ts` |
+| Reset password | `POST /api/auth/reset-password` | `/api/v1/auth/reset-password` | `reset-password/(hooks)/use-reset-password-form.ts` |
+| Verify invite | `POST /api/auth/verify-invite-user`, body `{code}` | Next handler -> `/api/v1/user/verify-invite-user` | `registration/(hooks)/use-verify-invite.ts` |
+| Registration presign | `GET /api/v1/user/presigned-upload-url` | direct external API | `registration/(hooks)/use-registration-form.ts` |
 | Registration upload | `PUT {presignedUrl}` | object storage | same hook |
-| Set avatar | `PATCH core /user/avatar`, body `{avatar: key}` | direct backend | same hook |
-| Accept invite | `POST /api/auth/accept-invite`, body invite code, identity and passwords | Next handler -> core `/user/accept-invite` | same hook |
-| Registration token | `POST /api/auth/registration-token`, body email/password | Next handler -> core `/auth/login`; returns a short-lived access token for optional avatar upload | same hook |
-| Refresh | `POST /api/auth/refresh-token` | Next handler -> core refresh | `src/lib/api.ts` |
+| Set avatar | `PATCH /api/v1/user/avatar`, body `{avatar: key}` | direct external API | same hook |
+| Accept invite | `POST /api/auth/accept-invite`, body invite code, identity and passwords | Next handler -> `/api/v1/user/accept-invite` | same hook |
+| Registration token | `POST /api/auth/registration-token`, body email/password | Next handler -> `/api/v1/auth/login`; returns a short-lived access token for optional avatar upload | same hook |
+| Refresh | `POST /api/auth/refresh-token` | Next handler -> `/api/v1/auth/refresh-token` | `src/lib/api.ts` |
 | Socket token | `GET /api/auth/socket-token` | Next handler (reads AT cookie for Socket.IO/SSE) | `use-chat-socket.ts`, `use-notification-sse.ts` |
 | Logout | `POST /api/auth/logout`, `PUT /api/clear-cookies` | Next handlers | `src/lib/api.ts` |
 

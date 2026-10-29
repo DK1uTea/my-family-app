@@ -1,4 +1,4 @@
-import { CORE_API_URL } from "@/lib/constant";
+import { API_URL } from "@/lib/constant";
 import { type NextRequest, NextResponse } from "next/server";
 
 type LoginResponse = {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Missing credentials" }, { status: 400 });
     }
 
-    const response = await fetch(`${CORE_API_URL}/auth/login`, {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

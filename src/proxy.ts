@@ -1,7 +1,7 @@
 import createMiddleware from 'next-intl/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
-import { CORE_API_URL } from './lib/constant';
+import { API_URL } from './lib/constant';
 import { isDomainAllowed } from './lib/domain-guard';
 
 const intlMiddleware = createMiddleware(routing);
@@ -89,7 +89,7 @@ async function fetchUserPreferences(req: NextRequest, accessToken?: string): Pro
   if (!accessToken) return {};
 
   try {
-    const response = await fetch(`${CORE_API_URL}/user/me`, {
+    const response = await fetch(`${API_URL}/user/me`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'x-lang': getPathLocale(req.nextUrl.pathname) ?? getPreferredLocale(req),

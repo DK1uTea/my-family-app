@@ -1,90 +1,88 @@
 # 06 — Integration
 
-## API Calls — Direct from Hooks, Proxied Through the Next Server
+## API boundary in this full-stack app
 
+The browser always calls same-origin Next.js API routes. A route can either proxy an
+existing external API endpoint or call a first-party server module. There is no separate
+NestJS application.
+
+```text
+Feature hook / TanStack Query
+          │ same-origin request through apiProxy
+          ▼
+Next.js Route Handler (`src/app/api/**/route.ts`)
+          ├── existing endpoint → external API catch-all proxy
+          └── first-party endpoint → `src/server/modules/<domain>`
+                                      │ repository contract
+                                      ▼
+                            `src/server/layer-data/<domain>` Prisma adapter
+                                      │ shared Prisma client
+                                      ▼
+                            Prisma Neon adapter -> Neon Postgres
 ```
-Backend NestJS (internal network only)
-  └── REST endpoint
-        └── /api/[...path] catch-all route handler forwards server-side
-              └── feature hook's fetcher() calls apiProxy
-                    └── TanStack Query wraps it in useQuery / useMutation
-```
 
-There is no code-generation step between a hook and the endpoint it calls, and no direct browser-to-backend call — every request goes through the Next.js server, which forwards it to the backend over the internal network.
+The request path follows the controller/service/repository/data-provider responsibility
+split used by the reference backend: Route Handler handles HTTP, the module service owns
+the use case, the repository adapter implements persistence, and the shared Prisma client
+connects to Neon. Compose these with TypeScript factories; this does not add NestJS.
 
-**Rules:**
-- Define the fetcher inline at the top of the hook file; extract a `(services)/<name>-service.ts` only when the same fetcher is reused by multiple hooks
-- No try/catch in the fetcher — the api client's response interceptor handles error toasts globally (see Error Handling below)
+### Current and planned routes
 
-## Error Handling
+- Existing feature API calls continue through `src/app/api/[...path]/route.ts` to the
+  configured external backend at `<NEXT_PUBLIC_API_BASE_URL>/api/v1/...`; no service
+  prefix such as `/core` is inserted.
+- Existing `/api/auth/*` handlers and cookie behavior remain active during migration.
+- `/api/health/database` is a first-party connectivity probe only; it does not implement
+  application data operations. It verifies connectivity through the configured Prisma
+  client and Neon adapter.
+- `/api/docs` renders Swagger UI from `/api/openapi.json`; the OpenAPI source is
+  `src/server/openapi/spec.ts`. Add operations there as first-party routes are implemented.
+- Proposed first-party auth and user endpoints are specified beside their modules in
+  `src/server/modules/auth/SPEC.md` and `src/server/modules/users/SPEC.md`. They are not
+  implemented yet.
 
-The backend responds with `{ status, message, error_code, data }`. `error_code` is a stable machine key (e.g. `WRONG_PASSWORD`, `INVITATION_EXPIRED`).
+## Frontend API rules
 
-- `getErrorMessage(error_code)` (`@/lib/get-error-message`) resolves it to a translated string from the **`errors`** namespace in `src/messages/en.json` / `de.json` (dots become underscores; falls back to `errors.default`)
-- The `apiProxy` response interceptor calls this and fires `toast.error()` automatically on any 4xx/5xx — feature code never needs its own try/catch or toast for API errors
-- **New backend `error_code` → add a matching key under `errors` in both `en.json` and `de.json`**
+- Define a fetcher inline at the top of the hook file; extract a service only when multiple
+  hooks reuse it.
+- No try/catch in the fetcher; the API client's response interceptor handles global error
+  toasts.
+- Existing external-backend responses use `{ status, message, error_code, data }`.
+- `getErrorMessage(error_code)` resolves translated strings from the `errors` namespace
+  in `src/messages/en.json` and `de.json`.
+- New `error_code` values require matching translation keys in both locale files.
+- A first-party route must follow its module spec and use real HTTP status codes; do not
+  assume legacy HTTP-200 envelope behavior unless that endpoint is still proxied.
 
-## TanStack Query
+## TanStack Query and URL state
 
-- All data fetching is CSR — no `fetch()` in Server Components for authenticated data
-- Default options configured in `src/lib/query-config.ts`
-- Cache invalidation via `queryClient.invalidateQueries()` in mutation `onSuccess`
-- `queryKey` arrays include URL filter params so nuqs URL changes trigger automatic refetches
+- Existing data fetching is CSR through TanStack Query and `apiProxy`.
+- Default query behavior is configured in `src/lib/query-config.ts`.
+- Invalidate cache with `queryClient.invalidateQueries()` after mutations.
+- Include URL filter state in query keys so nuqs changes select the correct cached result.
 
-## URL State → Data Flow
-
-```
+```text
 nuqs setFilters(...)
-  → URL: ?page=2&search=foo
-  → queryKey: ['users', { page: 2, search: 'foo' }]
-  → TanStack Query: cache miss → fetch
-  → hook's fetcher → apiProxy → /api → Next.js proxy → backend
-  → component re-renders
+  → URL changes
+  → queryKey changes
+  → TanStack Query reads cache or fetches
+  → hook fetcher → apiProxy → same-origin Next.js route
+  → external proxy or first-party server module
+  → component renders result
 ```
 
-`shallow: true` (nuqs default) — URL updates via `history.pushState` without a full navigation. TanStack Query still refetches because `queryKey` changes — not because of a navigation event.
-
-**Why nuqs?** In a standard React app, updating a search input calls `setState`, re-renders the component, and then (asynchronously) updates the URL. With nuqs, the URL is updated synchronously on every keystroke via `history.pushState`. The input feels instant because the param is in the URL before the next paint — no perceptible lag.
-
-## Form Integration
+## Forms, state, and dates
 
 | Layer | Location | Responsibility |
 |---|---|---|
-| Zod schema | `(helpers)/<feature>-schema.ts` | Validation rules + TS types |
-| Form hook | `(hooks)/use-<name>-form.ts` | `useForm`, `zodResolver`, submit handler, mutation |
-| Component | `(components)/<name>-form.tsx` | Renders fields only, no logic |
-| Child fields | use `useFormContext()` | For complex multi-step or decomposed forms |
+| Zod schema | `(helpers)/<feature>-schema.ts` | Validation rules and TypeScript types |
+| Form hook | `(hooks)/use-<name>-form.ts` | `useForm`, resolver, submit and mutation |
+| Component | `(components)/<name>-form.tsx` | Accessible field rendering |
+| Child fields | `useFormContext()` | Decomposed or multi-step forms |
 
-Validation messages reference i18n keys resolved at runtime — no hardcoded strings in zod schemas.
+Validation messages use i18n keys. Zustand stores application-wide state that belongs
+neither in the URL nor the server cache.
 
-## Zustand (Global State)
-
-Used for application-level state that does not belong in the URL or server cache (e.g., sidebar state, user preference overrides, cross-feature event bus). Stores live in `src/shared/stores/`.
-
-## Date & Time
-
-All timestamps in the DB are stored as **UTC+0**, but the stored value **is** Germany local time — the server applies no offset (e.g. "14:00 Germany time" is stored as `14:00Z`).
-
-```ts
-import { formatDate, nowUtc, toApiDate } from '@/lib/date-utils';
-import { useDateFormat } from '@/shared/stores/use-user-store';
-
-const dateFormat = useDateFormat(); // from user preferences store
-
-// ✅ Display a DB date — always use formatDate with the user's format
-formatDate(dbDate, dateFormat)           // date only  → "04/06/2026"
-formatDate(dbDate, dateFormat, true)     // with time  → "04/06/2026 14:00"
-
-// ✅ Current time
-nowUtc()
-
-// ✅ Serialize for API
-toApiDate(pickedDate)
-
-// ❌ Never hardcode format strings — dayjs.utc(x).format('DD/MM/YYYY HH:mm')
-// ❌ Never use bare dayjs(), new Date(), or .toISOString()
-```
-
----
-
-*Next: `07-MODULE-WIDGET-SYSTEM.md`.*
+Database timestamps are stored as UTC+0 values representing Germany local time. Use
+`formatDate`, `nowUtc`, and `toApiDate` from `src/lib/date-utils.ts`; do not use bare
+`Date`, `dayjs`, or `.toISOString()` for application dates.

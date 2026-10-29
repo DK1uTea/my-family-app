@@ -1,19 +1,23 @@
 {
   "version": 1,
   "skills": {
+    "neon": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neon/SKILL.md",
+      "computedHash": "3df8be402d08df1506ba7ff1962dd935e07100d75e38a3dd6feb886760e05817"
+    },
+    "neon-postgres": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neon-postgres/SKILL.md",
+      "computedHash": "3c09fbeadf705429a831b7321e535a43655bddf733438b8ffa5dae2537dd6efc"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "f0fdd03f4755cbb3b57e20fe6fd4a97c00d34e6780187b6559316986e8d848db"
-    },
-    "test-driven-development": {
-      "source": "addyosmani/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/test-driven-development/SKILL.md",
-      "installedTo": ".claude/skills/test-driven-development/SKILL.md",
-      "adapted": true,
-      "upstreamHash": "71fdddb96c2c54041fcfbfdaef3c172b202fb9240b609e658d9d82edbed6cad1"
     },
     "spec-driven-development": {
       "source": "addyosmani/agent-skills",
@@ -22,6 +26,14 @@
       "installedTo": ".claude/skills/spec-driven-development/SKILL.md",
       "adapted": true,
       "upstreamHash": "af5b873414a8b45b96b0d30d5297400f55eb3a56425161a088e470c14260a1e5"
+    },
+    "test-driven-development": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "installedTo": ".claude/skills/test-driven-development/SKILL.md",
+      "adapted": true,
+      "upstreamHash": "71fdddb96c2c54041fcfbfdaef3c172b202fb9240b609e658d9d82edbed6cad1"
     }
   }
 }
