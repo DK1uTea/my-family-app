@@ -33,7 +33,7 @@ const ForgotPasswordForm = () => {
       <div className="h-full flex flex-col gap-20 items-center justify-center max-w-105">
         <div className="flex justify-center">
           <Image
-            src="/images/logo_red.png"
+            src="/images/logo_green.png"
             alt="Logo"
             width={800}
             height={143}
@@ -69,8 +69,8 @@ const ForgotPasswordForm = () => {
             {t('sendResetLink')}
           </Button>
           <Button variant="ghost" href="/login">
-            <ChevronLeft className="text-destructive" />
-            <span className="text-destructive">{t('backToLogin')}</span>
+            <ChevronLeft className="text-primary" />
+            <span className="text-primary">{t('backToLogin')}</span>
           </Button>
         </form>
       </div>

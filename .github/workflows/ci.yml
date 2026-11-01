@@ -15,10 +15,24 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm db:check
+      - run: pnpm db:generate
+      - name: Verify schema changes include a committed migration
+        run: |
+          if [ -n "$(git status --porcelain -- src/server/drizzle/migrations)" ]; then
+            echo "Drizzle migrations are missing or out of date. Run pnpm db:generate, review the SQL, and commit the generated files."
+            git status --short -- src/server/drizzle/migrations
+            exit 1
+          fi
+      - run: pnpm openapi:check
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build
+      - name: Build
+        run: pnpm build
+        env:
+          # Route modules initialize Drizzle during build; the build does not query the database.
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci

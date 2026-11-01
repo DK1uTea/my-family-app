@@ -6,7 +6,7 @@ import { DashboardsPage } from './dashboards.page';
 /**
  * dashboards — reaching the module.
  *
- * `/de/dashboards` is also where `signIn` itself redirects to, so this doubles as the
+ * `/vi/dashboards` is also where `signIn` itself redirects to, so this doubles as the
  * assertion that login lands here. Walking through the sidebar click still exercises the
  * "already there, click it again" path and the guard chain for an unauthenticated visit.
  */
@@ -17,7 +17,7 @@ test.describe('dashboards journey', () => {
   }) => {
     await signIn(page);
 
-    await expect(page).toHaveURL(/\/de\/dashboards/);
+    await expect(page).toHaveURL(/\/vi\/dashboards/);
     await expect(sidebarLink(page, 'dashboards')).toBeVisible();
 
     const dashboard = new DashboardsPage(page);
@@ -31,7 +31,7 @@ test.describe('dashboards journey', () => {
   test('sends an unauthenticated visitor to login instead', async ({ page }) => {
     await page.goto(MODULES.dashboards.href);
 
-    await expect(page).toHaveURL(/\/de\/login/);
+    await expect(page).toHaveURL(/\/vi\/login/);
   });
 
   test('clicking Create Event navigates to the new-event page', async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe('dashboards journey', () => {
     const dashboard = new DashboardsPage(page);
     await dashboard.createEventButton.click();
 
-    await expect(page).toHaveURL(/\/de\/events\/new-event/);
+    await expect(page).toHaveURL(/\/vi\/events\/new-event/);
   });
 
   test('clicking Go to Calendar navigates to the calendar tab of the event navigator', async ({
@@ -51,6 +51,6 @@ test.describe('dashboards journey', () => {
     const dashboard = new DashboardsPage(page);
     await dashboard.goToCalendarButton.click();
 
-    await expect(page).toHaveURL(/\/de\/events\?tab=calendar/);
+    await expect(page).toHaveURL(/\/vi\/events\?tab=calendar/);
   });
 });

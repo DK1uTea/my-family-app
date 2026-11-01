@@ -1,7 +1,8 @@
 'use client';
 
 import type * as React from 'react';
-import { dayjs } from '@/lib/date-utils';
+import { formatDate } from '@/lib/date-utils';
+import { useDateFormat } from '@/shared/stores/use-user-store';
 import { cn } from '@/lib/utils';
 
 export function DetailTextField({ value }: { value: string }) {
@@ -23,6 +24,8 @@ export function DetailDateField({
   valueClassName?: string;
   labelExtra?: React.ReactNode;
 }) {
+  const dateFormat = useDateFormat();
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
@@ -33,7 +36,7 @@ export function DetailDateField({
         className={cn('rounded-detail-field bg-gray-100 px-4 py-3 text-sm', valueClassName)}
         translate="no"
       >
-        {value ? dayjs.utc(value).format('MMMM D, YYYY - HH:mm') : '—'}
+        {value ? formatDate(value, dateFormat, true) : '—'}
       </div>
     </div>
   );

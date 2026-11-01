@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { AlignJustifyIcon } from 'lucide-react'
@@ -15,10 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-import { IconLogout, IconUserSettings } from '@/shared/components/common/icons'
+import { IconUserSettings } from '@/shared/components/common/icons'
 import { AppBreadcrumbs } from './app-breadcrumbs'
 import { Link } from '@/i18n/navigation'
-import { clientLogout } from '@/lib/api'
 import { useUserStore } from '@/shared/stores/use-user-store'
 
 export function AppHeader() {
@@ -30,7 +28,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b border-border bg-background-header px-6 py-3">
       {/* Mobile: logo */}
       <div className="md:hidden">
-        <Image src="/images/logo_red.png" alt="CCEP" width={800} height={143} priority className="object-contain w-auto h-15" />
+        <Image src="/images/logo_green.png" alt="CCEP" width={800} height={143} priority className="object-contain w-auto h-15" />
       </div>
 
       {/* Desktop: breadcrumbs */}
@@ -43,7 +41,7 @@ export function AppHeader() {
       <div className="flex items-center gap-4">
         {/* Avatar — desktop only */}
         <div className="hidden md:block">
-          <UserMenu logoutLabel={tCommon('logout')} userSettingsLabel={tNav('userSettings')} />
+          <UserMenu userSettingsLabel={tNav('userSettings')} />
         </div>
 
         {/* Sidebar trigger — mobile only */}
@@ -62,16 +60,10 @@ export function AppHeader() {
   )
 }
 
-function UserMenu({ logoutLabel, userSettingsLabel }: { logoutLabel: string; userSettingsLabel: string }) {
+function UserMenu({ userSettingsLabel }: { userSettingsLabel: string }) {
   const user = useUserStore(state => state.user)
   const displayName = user.name || [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email || ''
   const initials = getUserInitials(displayName || user.email)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-    await clientLogout()
-  }
 
   return (
     <DropdownMenu>
@@ -102,13 +94,6 @@ function UserMenu({ logoutLabel, userSettingsLabel }: { logoutLabel: string; use
             {userSettingsLabel}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <div className="p-1">
-          <Button className="w-full gap-2" size="default" isLoading={isLoggingOut} onClick={handleLogout}>
-            <IconLogout className="size-4" />
-            {logoutLabel}
-          </Button>
-        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )

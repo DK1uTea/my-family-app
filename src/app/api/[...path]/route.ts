@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/constant";
 function normalizeLocale(locale: unknown) {
   if (typeof locale !== "string") return undefined;
   const normalized = locale.toLowerCase();
-  return normalized === "en" || normalized === "de" ? normalized : undefined;
+  return normalized === "en" || normalized === "vi" ? normalized : undefined;
 }
 
 function normalizeAppearance(appearance: unknown) {

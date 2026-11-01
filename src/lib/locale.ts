@@ -1,6 +1,6 @@
 const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
-const DEFAULT_LOCALE = 'de';
-const SUPPORTED_LOCALES = ['en', 'de'] as const;
+const DEFAULT_LOCALE = 'vi';
+const SUPPORTED_LOCALES = ['en', 'vi'] as const;
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10; // seconds
 
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -22,7 +22,7 @@ export function setLocale(locale: string): void {
   document.cookie = `${LOCALE_COOKIE_NAME}=${valid}; path=/; max-age=${TEN_YEARS}; SameSite=Lax`;
 }
 
-/** Get current locale from cookie, fallback to DE */
+/** Get current locale from cookie, fallback to Vietnamese */
 export function getLocale(): AppLocale {
   return readCookieLocale();
 }

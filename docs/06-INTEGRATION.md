@@ -49,7 +49,7 @@ connects to Neon. Compose these with TypeScript factories; this does not add Nes
   toasts.
 - Existing external-backend responses use `{ status, message, error_code, data }`.
 - `getErrorMessage(error_code)` resolves translated strings from the `errors` namespace
-  in `src/messages/en.json` and `de.json`.
+  in `src/messages/en.json` and `vi.json`.
 - New `error_code` values require matching translation keys in both locale files.
 - A first-party route must follow its module spec and use real HTTP status codes; do not
   assume legacy HTTP-200 envelope behavior unless that endpoint is still proxied.

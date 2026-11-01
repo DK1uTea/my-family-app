@@ -32,9 +32,10 @@ function TextareaFloat({
 
   return (
     <div className="flex flex-col gap-1">
-      <div
+      <label
+        htmlFor={inputId}
         className={cn(
-          'relative w-full rounded-textarea-float border bg-background transition-colors overflow-hidden',
+          'relative block w-full rounded-textarea-float border bg-background transition-colors overflow-hidden',
           focused
             ? error ? 'border-destructive' : 'border-primary'
             : error ? 'border-destructive' : 'border-input hover:border-primary',
@@ -59,8 +60,7 @@ function TextareaFloat({
             className,
           )}
         />
-        <label
-          htmlFor={inputId}
+        <span
           className={cn(
             'pointer-events-none absolute z-10 select-none transition-all duration-150',
             isFloating
@@ -70,8 +70,8 @@ function TextareaFloat({
           )}
         >
           {label}
-        </label>
-      </div>
+        </span>
+      </label>
       <div className="flex items-center justify-between">
         <span>
           {error && <p className="text-[13px] text-destructive">{error}</p>}

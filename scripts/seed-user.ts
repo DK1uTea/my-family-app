@@ -7,77 +7,75 @@ import { users, userPreferences } from "../src/server/drizzle/schema";
 config({ path: ".env.local" });
 config({ path: ".env" });
 
-const connectionString =
-  process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
-
-if (!connectionString) {
-  console.error("Missing DATABASE_URL or DATABASE_URL_UNPOOLED in environment");
-  process.exit(1);
-}
-
 async function seed() {
-  const email = process.argv[2] || "admin@example.com";
-  const password = process.argv[3] || "Password123!";
-  const firstName = process.argv[4] || "Admin";
-  const lastName = process.argv[5] || "User";
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("The super admin seed is disabled in production.");
+  }
+  if (process.env.NEON_BRANCH !== "development") {
+    throw new Error("Set NEON_BRANCH=development and verify neon status before seeding.");
+  }
 
-  console.log(`Seeding user: ${email}...`);
+  const connectionString =
+    process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+  const email = process.env.SEED_SUPER_ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.SEED_SUPER_ADMIN_PASSWORD;
+  const firstName = process.env.SEED_SUPER_ADMIN_FIRST_NAME?.trim() || "Super";
+  const lastName = process.env.SEED_SUPER_ADMIN_LAST_NAME?.trim() || "Admin";
+
+  if (!connectionString) {
+    throw new Error("Missing DATABASE_URL or DATABASE_URL_UNPOOLED in environment.");
+  }
+  if (!email || !password) {
+    throw new Error(
+      "Set SEED_SUPER_ADMIN_EMAIL and SEED_SUPER_ADMIN_PASSWORD in .env.local before running pnpm db:seed.",
+    );
+  }
+  if (password.length < 12) {
+    throw new Error("SEED_SUPER_ADMIN_PASSWORD must be at least 12 characters.");
+  }
 
   const pool = new Pool({ connectionString });
-  const db = drizzle(pool);
 
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  const insertedUsers = await db
-    .insert(users)
-    .values({
-      email,
-      passwordHash,
-      firstName,
-      lastName,
-      roleKey: "admin",
-      permissions: ["*"],
-      navbar: null,
-      failedAttempts: 0,
-      isLocked: false,
-    })
-    .onConflictDoUpdate({
-      target: users.email,
-      set: {
+  try {
+    const db = drizzle(pool);
+    const passwordHash = await bcrypt.hash(password, 12);
+    const insertedUsers = await db
+      .insert(users)
+      .values({
+        email,
         passwordHash,
         firstName,
         lastName,
-        isLocked: false,
+        roleKey: "admin",
+        permissions: ["*"],
+        navbar: null,
         failedAttempts: 0,
-        lockedUntil: null,
-      },
-    })
-    .returning({ id: users.id });
+        isLocked: false,
+      })
+      .onConflictDoNothing({ target: users.email })
+      .returning({ id: users.id });
 
-  const userId = insertedUsers[0].id;
+    const user = insertedUsers[0];
+    if (!user) {
+      console.log(`User ${email} already exists; no account data was changed.`);
+      return;
+    }
 
-  await db
-    .insert(userPreferences)
-    .values({
-      userId,
-      preferredLanguage: "de",
+    await db.insert(userPreferences).values({
+      userId: user.id,
+      preferredLanguage: "vi",
       appearance: "light",
       currency: "EUR",
       dateFormat: "DD/MM/YYYY",
-    })
-    .onConflictDoUpdate({
-      target: userPreferences.userId,
-      set: {
-        preferredLanguage: "de",
-        appearance: "light",
-      },
     });
 
-  console.log(`✓ Seeded user ${email} (ID: ${userId}) with password "${password}"`);
-  await pool.end();
+    console.log(`Super admin ${email} created (ID: ${user.id}).`);
+  } finally {
+    await pool.end();
+  }
 }
 
-seed().catch((err) => {
-  console.error("Seed error:", err);
-  process.exit(1);
+seed().catch((error) => {
+  console.error("Seed error:", error instanceof Error ? error.message : error);
+  process.exitCode = 1;
 });

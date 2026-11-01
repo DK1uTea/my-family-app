@@ -131,7 +131,7 @@ There is no `real.spec.ts` aspect — every spec already is real.
 - **`<module>.page.ts`** — the page object. All locators live here so a markup or copy
   change touches one file. Document any locator that looks odd, with the reason.
 - **`<module>.data.ts`** — credentials (read from env via the helpers in
-  `e2e/shared/session.ts`) and the exact strings the user sees. German, since `de` is the
+  `e2e/shared/session.ts`) and the exact strings the user sees. Vietnamese, since `vi` is the
   default locale.
 
 ## Locators — `data-testid` first, not role/text
@@ -258,7 +258,7 @@ Full recipe in `.claude/skills/browser-verification-playwright/SKILL.md`. The sh
    `browser_network_request`.
 4. `browser_console_messages` — zero errors, zero warnings.
 
-Never write an assertion for a string you found in `de.json` but did not see rendered.
+Never write an assertion for a string you found in `vi.json` but did not see rendered.
 
 ## Step 3 — Scaffold
 
@@ -271,7 +271,7 @@ pnpm e2e:new impressum --public           # no sign-in needed
 are not writing (usually everything except the module's business-flow spec(s), per "One spec
 file per business flow" above), and rename the generated `flow.spec.ts` to the actual flow
 name. For an authenticated module, add the module to `MODULES` in `e2e/shared/session.ts`
-first, with its href and the German sidebar label.
+first, with its href and the Vietnamese sidebar label.
 
 ## Step 4 — Write the spec
 

@@ -7,7 +7,7 @@ function setAuthCookies(
   res: NextResponse,
   accessToken: string,
   refreshToken?: string,
-  preferredLanguage = "de",
+  preferredLanguage = "vi",
   appearance = "light",
 ) {
   const isProd = process.env.NODE_ENV !== "development";
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
         ? await usersService.findProfileById(payload.sub)
         : null;
 
-      const preferredLanguage = user?.preferences?.preferredLanguage ?? "de";
+      const preferredLanguage = user?.preferences?.preferredLanguage ?? "vi";
       const appearance = user?.preferences?.appearance ?? "light";
 
       const nextResponse = NextResponse.json(

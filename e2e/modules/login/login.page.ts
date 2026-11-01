@@ -8,40 +8,40 @@ import type { Locator, Page } from '@playwright/test';
  * controls properly — see `e2e/modules/login/a11y.spec.ts` for the tests that keep it that way.
  */
 
-/** Visible copy, from `login.*` in `src/messages/de.json`. */
-export const DE = {
-  emailLabel: 'E-Mail',
-  passwordLabel: 'Passwort',
+/** Visible copy, from `login.*` in `src/messages/vi.json`. */
+export const LOGIN_COPY = {
+  emailLabel: 'Email',
+  passwordLabel: 'Mật khẩu',
   emailPlaceholder: 'user@example.com',
-  passwordPlaceholder: 'Min. 6 Zeichen',
-  rememberMe: 'Angemeldet bleiben',
-  forgotPassword: 'Passwort vergessen?',
-  showPassword: 'Passwort anzeigen',
-  hidePassword: 'Passwort verbergen',
-  submit: 'Anmelden',
+  passwordPlaceholder: 'Tối thiểu 6 ký tự',
+  rememberMe: 'Duy trì đăng nhập',
+  forgotPassword: 'Quên mật khẩu?',
+  showPassword: 'Hiện mật khẩu',
+  hidePassword: 'Ẩn mật khẩu',
+  submit: 'Đăng nhập',
 } as const;
 
-/** Error copy the form can render, from `de.json`. */
-export const DE_ERRORS = {
+/** Error copy the form can render, from `vi.json`. */
+export const LOGIN_ERRORS = {
   /** `fieldErrors.email` — note this fires for an empty email too, not `login.validation.emailRequired`. */
-  emailInvalid: 'Bitte gib eine gültige E-Mail-Adresse ein',
+  emailInvalid: 'Vui lòng nhập địa chỉ email hợp lệ',
   /** `login.validation.passwordRequired` */
-  passwordRequired: 'Passwort ist erforderlich',
+  passwordRequired: 'Mật khẩu là bắt buộc',
   /** `login.validation.passwordMin` */
-  passwordMin: 'Das Passwort muss mindestens 6 Zeichen lang sein',
+  passwordMin: 'Mật khẩu phải có ít nhất 6 ký tự',
   /** `login.attemptsRemaining`, ICU plural */
   attemptsRemaining: (count: number) =>
     count === 1
-      ? 'Falsche E-Mail-Adresse oder falsches Passwort. Sie haben noch 1 Versuch.'
-      : `Falsche E-Mail-Adresse oder falsches Passwort. Sie haben noch ${count} Versuche.`,
+      ? 'Email hoặc mật khẩu không chính xác. Bạn còn 1 lần thử.'
+      : `Email hoặc mật khẩu không chính xác. Bạn còn ${count} lần thử.`,
   /** `login.accountLockedWithDuration`, ICU plural */
   accountLocked: (minutes: number) =>
     minutes === 1
-      ? 'Ihr Konto wurde vorübergehend gesperrt. Bitte versuchen Sie es in 1 Minute erneut.'
-      : `Ihr Konto wurde vorübergehend gesperrt. Bitte versuchen Sie es in ${minutes} Minuten erneut.`,
+      ? 'Tài khoản của bạn tạm thời bị khóa. Vui lòng thử lại sau 1 phút.'
+      : `Tài khoản của bạn tạm thời bị khóa. Vui lòng thử lại sau ${minutes} phút.`,
   /** `login.captchaNotReady` */
   captchaNotReady:
-    'Bitte warten Sie einen Moment, die Sicherheitsüberprüfung wird noch geladen, und versuchen Sie es dann erneut.',
+    'Vui lòng đợi trong khi xác minh bảo mật đang tải, sau đó thử lại.',
 } as const;
 
 export class LoginPage {
@@ -63,21 +63,21 @@ export class LoginPage {
     // ("E-Mail*", asterisk included) and ignores aria-hidden, so an exact match there
     // finds nothing. getByRole runs the real accessible-name computation. `exact` also
     // keeps "Passwort" from resolving the toggle button ("Passwort anzeigen").
-    this.email = page.getByRole('textbox', { name: DE.emailLabel, exact: true });
-    this.password = page.getByRole('textbox', { name: DE.passwordLabel, exact: true });
+    this.email = page.getByRole('textbox', { name: LOGIN_COPY.emailLabel, exact: true });
+    this.password = page.getByRole('textbox', { name: LOGIN_COPY.passwordLabel, exact: true });
 
     // The toggle's accessible name flips with its state, so match either.
     this.passwordToggle = page.getByRole('button', {
-      name: new RegExp(`${DE.showPassword}|${DE.hidePassword}`),
+      name: new RegExp(`${LOGIN_COPY.showPassword}|${LOGIN_COPY.hidePassword}`),
     });
 
-    this.rememberMe = page.getByRole('checkbox', { name: DE.rememberMe });
-    this.forgotPasswordLink = page.getByRole('link', { name: DE.forgotPassword });
-    this.submit = page.getByRole('button', { name: DE.submit });
+    this.rememberMe = page.getByRole('checkbox', { name: LOGIN_COPY.rememberMe });
+    this.forgotPasswordLink = page.getByRole('link', { name: LOGIN_COPY.forgotPassword });
+    this.submit = page.getByRole('button', { name: LOGIN_COPY.submit });
   }
 
   async goto(search = '') {
-    await this.page.goto(`/de/login${search}`);
+    await this.page.goto(`/vi/login${search}`);
   }
 
   async fillCredentials(email: string, password: string) {

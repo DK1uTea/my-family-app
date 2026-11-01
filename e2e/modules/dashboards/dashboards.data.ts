@@ -1,28 +1,28 @@
 import { dayjs } from '@/lib/date-utils';
 
 /**
- * dashboards — visible copy (German, the default locale), read from
- * `src/messages/de.json` under the `dashboard` namespace and cross-checked against
+ * dashboards — visible copy (Vietnamese, the default locale), read from
+ * `src/messages/vi.json` under the `dashboard` namespace and cross-checked against
  * `src/features/dashboard/(components)/*` and `(helpers)/dashboard-greeting.tsx`.
  */
 export const COPY = {
-  welcomeGeneric: 'Willkommen in Ihrem Dashboard!',
-  createEvent: 'Event erstellen',
-  goToCalendar: 'Zum Kalender',
-  yourUpcomingEvents: 'Ihre bevorstehenden Events',
-  yourUpcomingEventsDescription: 'Die nächsten 3 Events in Ihrem Kalender',
-  teamUpcomingEvents: 'Bevorstehende Team-Events',
-  teamUpcomingEventsDescription: 'Die nächsten 3 Events aller Benutzer',
-  noUpcomingEvents: 'Keine bevorstehenden Events',
-  noUpcomingEventsDescription: 'Sie haben keine Events in naher Zukunft geplant.',
-  noTeamEvents: 'Keine Team-Events',
-  noTeamEventsDescription: 'Ihr Team hat keine bevorstehenden Events.',
-  metrics: 'Kennzahlen',
-  includeFutureEvents: 'zukünftige Events einbeziehen',
-  at: 'um',
-  organizedBy: (name: string) => `Organisiert von ${name}`,
+  welcomeGeneric: 'Chào mừng bạn đến với bảng điều khiển!',
+  createEvent: 'Tạo sự kiện',
+  goToCalendar: 'Đến lịch',
+  yourUpcomingEvents: 'Sự kiện sắp tới của bạn',
+  yourUpcomingEventsDescription: '3 sự kiện tiếp theo trong lịch của bạn',
+  teamUpcomingEvents: 'Sự kiện sắp tới của nhóm',
+  teamUpcomingEventsDescription: '3 sự kiện tiếp theo của tất cả người dùng',
+  noUpcomingEvents: 'Không có sự kiện sắp tới',
+  noUpcomingEventsDescription: 'Bạn chưa lên lịch sự kiện nào trong thời gian tới.',
+  noTeamEvents: 'Không có sự kiện nhóm',
+  noTeamEventsDescription: 'Nhóm của bạn không có sự kiện sắp tới.',
+  metrics: 'Chỉ số',
+  includeFutureEvents: 'Bao gồm sự kiện trong tương lai',
+  at: 'lúc',
+  organizedBy: (name: string) => `Được tổ chức bởi ${name}`,
   eventStartsIn: (count: number) =>
-    count === 1 ? `Fällig in ${count} Tag` : `Fällig in ${count} Tagen`,
+    `Còn ${count} ngày`,
 } as const;
 
 /**
@@ -33,10 +33,10 @@ export const COPY = {
 export function expectedGreeting(): string {
   const hour = dayjs.utc().hour();
 
-  if (hour >= 5 && hour < 11) return 'Guten Morgen';
-  if (hour >= 11 && hour < 18) return 'Guten Nachmittag';
-  if (hour >= 18 && hour < 22) return 'Guten Abend';
-  return 'Gute Nacht';
+  if (hour >= 5 && hour < 11) return 'Chào buổi sáng';
+  if (hour >= 11 && hour < 18) return 'Chào buổi chiều';
+  if (hour >= 18 && hour < 22) return 'Chào buổi tối';
+  return 'Chúc ngủ ngon';
 }
 
 /** Full name greeting, built the same way `dashboard-main.tsx` does. */

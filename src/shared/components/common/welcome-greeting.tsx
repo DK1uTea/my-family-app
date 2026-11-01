@@ -16,7 +16,7 @@ const WEEKDAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'f
 
 export function WelcomeGreeting({ firstName, lastName, lastLogin, dateFormat }: WelcomeGreetingProps) {
   const t = useTranslations('dashboard')
-  const now = dayjs.utc()
+  const now = dayjs()
   const hour = now.hour()
   const hasName = firstName || lastName
 
@@ -34,7 +34,7 @@ export function WelcomeGreeting({ firstName, lastName, lastLogin, dateFormat }: 
     return t('textNight')
   }
 
-  const lastLoginMoment = lastLogin ? dayjs.utc(lastLogin) : now
+  const lastLoginMoment = lastLogin ? dayjs(lastLogin) : now
 
   return (
     <div>

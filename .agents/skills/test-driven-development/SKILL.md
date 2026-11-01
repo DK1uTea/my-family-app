@@ -207,7 +207,7 @@ it('disables itself and hides the label while loading', () => {
 - **Query by role, then by label, then by text.** Never by CSS class — classes are styling,
   and this repo's rules already forbid asserting on them.
 - **A component under `useTranslations` needs a provider.** Wrap it in
-  `NextIntlClientProvider` with the real `de.json` messages rather than mocking next-intl —
+  `NextIntlClientProvider` with the real `vi.json` messages rather than mocking next-intl —
   the real messages catch missing keys, which is a bug class this repo cares about.
 - **A component using `useQuery` needs a `QueryClientProvider`** with
   `retry: false` so a failing request fails fast instead of retrying through the timeout.

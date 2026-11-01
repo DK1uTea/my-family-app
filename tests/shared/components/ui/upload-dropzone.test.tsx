@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { toast } from 'sonner';
 
 import { UploadDropzone } from '@/shared/components/ui/upload-dropzone';
-import deMessages from '@/messages/de.json';
+import viMessages from '@/messages/vi.json';
 import enMessages from '@/messages/en.json';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -43,8 +43,8 @@ const dropFile = (file: File) => {
   });
 };
 
-const renderWithLocale = (ui: React.ReactNode, locale: 'de' | 'en' = 'en') => render(
-  <NextIntlClientProvider locale={locale} messages={locale === 'de' ? deMessages : enMessages}>
+const renderWithLocale = (ui: React.ReactNode, locale: 'vi' | 'en' = 'en') => render(
+  <NextIntlClientProvider locale={locale} messages={locale === 'vi' ? viMessages : enMessages}>
     {ui}
   </NextIntlClientProvider>,
 );
@@ -56,14 +56,14 @@ describe('UploadDropzone accept configuration', () => {
         onChange={vi.fn()}
         value={[{ name: 'proof.pdf', preview: 'blob:proof' }]}
       />,
-      'de',
+      'vi',
     );
 
-    expect(screen.getByText(/Bilder hier ablegen oder/)).toBeInTheDocument();
-    expect(screen.getByText('zum Auswählen klicken')).toBeInTheDocument();
-    expect(screen.getByText(/Maximal 10 Dateien/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Entfernen proof.pdf' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Alle entfernen' })).toBeInTheDocument();
+    expect(screen.getByText(/Thả ảnh vào đây hoặc/)).toBeInTheDocument();
+    expect(screen.getByText('nhấn để chọn')).toBeInTheDocument();
+    expect(screen.getByText(/Tối đa 10 tệp/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Xóa proof.pdf' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Xóa tất cả' })).toBeInTheDocument();
   });
 
   it('defaults to image-only mime types when no accept prop is given', () => {

@@ -3,7 +3,7 @@ import "server-only";
 import type { DateFormat } from "@/lib/date-utils";
 
 export type UserPreferencesRecord = {
-  preferredLanguage: "de" | "en";
+  preferredLanguage: "vi" | "en";
   appearance: "light" | "dark";
   currency: string;
   dateFormat: DateFormat;

@@ -6,8 +6,12 @@ import { dayjs } from '@/lib/date-utils'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-function buildGrid(viewDate: Date): Date[] {
-  const base = dayjs.utc(viewDate).startOf('month')
+function calendarDate(date: Date, localTime: boolean) {
+  return localTime ? dayjs(date) : dayjs.utc(date)
+}
+
+function buildGrid(viewDate: Date, localTime: boolean): Date[] {
+  const base = calendarDate(viewDate, localTime).startOf('month')
   const dow = base.day()
   const offset = dow === 0 ? 6 : dow - 1
   return Array.from({ length: 42 }, (_, i) => base.subtract(offset, 'day').add(i, 'day').toDate())
@@ -19,21 +23,22 @@ type Props = {
   onDayClickAction: (date: Date) => void
   disablePast?: boolean
   minDate?: Date
+  localTime?: boolean
 }
 
-export function MiniCalendar({ selected, range, onDayClickAction, disablePast, minDate }: Props) {
+export function MiniCalendar({ selected, range, onDayClickAction, disablePast, minDate, localTime = false }: Props) {
   const t = useTranslations('datePicker.weekdays')
   const locale = useLocale()
-  const init = selected ?? range?.from ?? range?.to ?? dayjs.utc().toDate()
+  const init = selected ?? range?.from ?? range?.to ?? (localTime ? dayjs() : dayjs.utc()).toDate()
   const [viewDate, setViewDate] = useState(init)
 
-  const today = dayjs.utc().startOf('day')
-  const minimumDate = minDate ? dayjs.utc(minDate).startOf('day') : null
+  const today = (localTime ? dayjs() : dayjs.utc()).startOf('day')
+  const minimumDate = minDate ? calendarDate(minDate, localTime).startOf('day') : null
   const firstAllowedDate =
     disablePast && (!minimumDate || today.isAfter(minimumDate, 'day')) ? today : minimumDate
-  const viewMonth = dayjs.utc(viewDate).month()
-  const viewYear = dayjs.utc(viewDate).year()
-  const days = buildGrid(viewDate)
+  const viewMonth = calendarDate(viewDate, localTime).month()
+  const viewYear = calendarDate(viewDate, localTime).year()
+  const days = buildGrid(viewDate, localTime)
 
   const isAtFirstAllowedMonth = firstAllowedDate &&
     viewMonth === firstAllowedDate.month() && viewYear === firstAllowedDate.year()
@@ -41,18 +46,18 @@ export function MiniCalendar({ selected, range, onDayClickAction, disablePast, m
 
   const goPrev = () => {
     if (!canGoPrev) return
-    setViewDate((d) => dayjs.utc(d).subtract(1, 'month').toDate())
+    setViewDate((d) => calendarDate(d, localTime).subtract(1, 'month').toDate())
   }
 
-  const goNext = () => setViewDate((d) => dayjs.utc(d).add(1, 'month').toDate())
+  const goNext = () => setViewDate((d) => calendarDate(d, localTime).add(1, 'month').toDate())
 
   const weekdays = [t('mo'), t('tu'), t('we'), t('th'), t('fr'), t('sa'), t('su')]
 
   return (
     <div className="w-full">
       <div className="mb-3.5 flex items-center justify-between">
-        <span className="text-sm font-medium" data-testid="mini-calendar-view-month" data-view-month={dayjs.utc(viewDate).format('YYYY-MM')}>
-          {dayjs.utc(viewDate).locale(locale).format('MMM YYYY')}
+        <span className="text-sm font-medium" data-testid="mini-calendar-view-month" data-view-month={calendarDate(viewDate, localTime).format('YYYY-MM')}>
+          {calendarDate(viewDate, localTime).locale(locale).format('MMM YYYY')}
         </span>
         <div className="flex gap-1">
           <button
@@ -82,19 +87,19 @@ export function MiniCalendar({ selected, range, onDayClickAction, disablePast, m
 
       <div className="grid grid-cols-7 gap-1.25 text-center text-sm">
         {days.map((date, i) => {
-          const djs = dayjs.utc(date)
+          const djs = calendarDate(date, localTime)
           const isCurrentMonth = djs.month() === viewMonth && djs.year() === viewYear
           const isToday = djs.isSame(today, 'day')
           const isPast = firstAllowedDate && djs.isBefore(firstAllowedDate, 'day')
           const isHighlighted =
-            (selected && djs.isSame(dayjs.utc(selected), 'day')) ||
-            (range?.from && djs.isSame(dayjs.utc(range.from), 'day')) ||
-            (range?.to && djs.isSame(dayjs.utc(range.to), 'day'))
+            (selected && djs.isSame(calendarDate(selected, localTime), 'day')) ||
+            (range?.from && djs.isSame(calendarDate(range.from, localTime), 'day')) ||
+            (range?.to && djs.isSame(calendarDate(range.to, localTime), 'day'))
           const isInRange =
             range?.from &&
             range?.to &&
-            djs.isAfter(dayjs.utc(range.from), 'day') &&
-            djs.isBefore(dayjs.utc(range.to), 'day')
+            djs.isAfter(calendarDate(range.from, localTime), 'day') &&
+            djs.isBefore(calendarDate(range.to, localTime), 'day')
 
           return (
             <button

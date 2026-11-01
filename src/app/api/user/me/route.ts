@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const preferredLanguage = user.preferences.preferredLanguage ?? "de";
+  const preferredLanguage = user.preferences.preferredLanguage ?? "vi";
   const appearance = user.preferences.appearance ?? "light";
 
   const response = NextResponse.json(

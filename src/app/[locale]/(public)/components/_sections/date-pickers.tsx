@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { nowUtc, formatDate } from '@/lib/date-utils'
+import { nowUtc, formatCalendarDate, formatDate } from '@/lib/date-utils'
 import { useDateFormat } from '@/shared/stores/use-user-store'
 import { DatePicker } from '@/shared/components/ui/date-picker'
 import { DateTimePicker } from '@/shared/components/ui/date-time-picker'
@@ -31,7 +31,7 @@ export function DatePickersSection() {
           <DatePicker value={singleDate} onChangeAction={setSingleDate} />
           {singleDate && (
             <p className="text-xs text-muted-foreground">
-              Selected: {formatDate(singleDate, dateFormat)}
+              Selected: {formatCalendarDate(singleDate, dateFormat)}
             </p>
           )}
         </div>
@@ -53,7 +53,7 @@ export function DatePickersSection() {
           <DateRangePicker onApplyAction={setAppliedRange} />
           {appliedRange.from && (
             <p className="text-xs text-muted-foreground">
-              Applied: {formatDate(appliedRange.from, dateFormat)} → {appliedRange.to ? formatDate(appliedRange.to, dateFormat) : '—'}
+              Applied: {formatCalendarDate(appliedRange.from, dateFormat)} → {appliedRange.to ? formatCalendarDate(appliedRange.to, dateFormat) : '—'}
             </p>
           )}
         </div>

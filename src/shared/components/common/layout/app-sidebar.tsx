@@ -1,7 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { Link, usePathname } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { IconLogout } from '@/shared/components/common/icons';
+import { clientLogout } from '@/lib/api';
 import {
   Sidebar,
   SidebarContent,
@@ -31,19 +35,31 @@ const NAV_ITEMS = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const tCommon = useTranslations('common');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await clientLogout();
+  };
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center gap-2 font-bold text-lg text-primary">
-          <span className="truncate">Ft My Family App</span>
-        </div>
+    <Sidebar collapsible="offcanvas">
+      <SidebarHeader className="border-b border-sidebar-border p-4">
+        <Image
+          src="/images/logo.png"
+          alt={tCommon('logoAlt')}
+          width={1000}
+          height={240}
+          priority
+          className="h-auto w-full max-w-52 object-contain"
+        />
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className='gap-1.5'>
               {NAV_ITEMS.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 return (
@@ -62,8 +78,22 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t text-xs text-muted-foreground">
-        <div className="truncate">v0.1.0</div>
+      <SidebarFooter className="border-t border-sidebar-border p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              aria-label={tCommon('logout')}
+              aria-busy={isLoggingOut}
+              tooltip={tCommon('logout')}
+            >
+              <IconLogout aria-hidden="true" />
+              <span>{tCommon('logout')}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

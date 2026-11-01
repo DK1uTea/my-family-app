@@ -84,7 +84,7 @@ export { Icon<ModuleName> } from './icon-<module-name>'
      navbarKeys: ['<module-name>'],                 // ← if permission-gated; must match BE navbar values (see normalize() at top of file — separators/case are ignored)
    },
    ```
-3. Add `<moduleName>` under `"navigation"` in **both** `src/messages/en.json` and `src/messages/de.json`:
+3. Add `<moduleName>` under `"navigation"` in **both** `src/messages/en.json` and `src/messages/vi.json`:
    ```json
    "navigation": {
      "...": "...",
@@ -164,14 +164,14 @@ export default function ModuleNameError({ error }: { error: Error }) {
 
 ## Step 6 — Feature i18n namespace
 
-Add a `<moduleName>` (camelCase) namespace to both `en.json`/`de.json` for the feature's own strings (separate from the `navigation.<moduleName>` sidebar label added in Step 3).
+Add a `<moduleName>` (camelCase) namespace to both `en.json`/`vi.json` for the feature's own strings (separate from the `navigation.<moduleName>` sidebar label added in Step 3).
 
 ## Final checklist
 
 - [ ] `ModuleKey` + `PERMISSIONS_TREE` + `PERMISSIONS` updated (only if gated)
 - [ ] One new icon file + re-exported from `icons/index.tsx`
 - [ ] `NAV_ITEMS` has the new entry (`alwaysShow` XOR `navbarKeys`)
-- [ ] `navigation.<moduleName>` key in `en.json` + `de.json`
+- [ ] `navigation.<moduleName>` key in `en.json` + `vi.json`
 - [ ] `src/features/<module-name>/` follows the `nextjs-feature` folder layout
 - [ ] `page.tsx` + `loading.tsx` + `error.tsx` all exist; `page.tsx` wrapped in `RouteGuard` only if gated
 - [ ] Feature's own i18n namespace added to both locale files

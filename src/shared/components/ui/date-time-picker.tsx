@@ -39,13 +39,13 @@ export function DateTimePicker({
   const timeInputId = useId()
   const [open, setOpen] = useState(false)
   const [draftDate, setDraftDate] = useState<Date>(value)
-  const [timeInput, setTimeInput] = useState(dayjs.utc(value).format('HH:mm'))
+  const [timeInput, setTimeInput] = useState(dayjs(value).format('HH:mm'))
 
   const getInitialDate = (currentValue: Date): Date => {
-    if (minDate && dayjs.utc(currentValue).isBefore(dayjs.utc(minDate), 'day')) {
-      const h = dayjs.utc(currentValue).hour()
-      const m = dayjs.utc(currentValue).minute()
-      return dayjs.utc(minDate).hour(h).minute(m).second(0).toDate()
+    if (minDate && dayjs(currentValue).isBefore(dayjs(minDate), 'day')) {
+      const h = dayjs(currentValue).hour()
+      const m = dayjs(currentValue).minute()
+      return dayjs(minDate).hour(h).minute(m).second(0).toDate()
     }
     return currentValue
   }
@@ -54,7 +54,7 @@ export function DateTimePicker({
     if (nextOpen) {
       const initialDate = getInitialDate(value)
       setDraftDate(initialDate)
-      setTimeInput(dayjs.utc(initialDate).format('HH:mm'))
+      setTimeInput(dayjs(initialDate).format('HH:mm'))
     }
     setOpen(nextOpen)
   }
@@ -63,7 +63,7 @@ export function DateTimePicker({
     const digits = timeStr.replace(/\D/g, '').padEnd(4, '0')
     const h = Math.min(23, parseInt(digits.slice(0, 2), 10))
     const m = Math.min(59, parseInt(digits.slice(2, 4), 10))
-    return dayjs.utc(draft).hour(h).minute(m).second(0).toDate()
+    return dayjs(draft).hour(h).minute(m).second(0).toDate()
   }
 
   const handleDayClick = (date: Date) => setDraftDate(applyTime(date, timeInput))
@@ -81,22 +81,22 @@ export function DateTimePicker({
     const h = Math.min(23, parseInt(digits.slice(0, 2), 10))
     const m = Math.min(59, parseInt(digits.slice(2, 4), 10))
     setTimeInput(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-    setDraftDate((date) => dayjs.utc(date).hour(h).minute(m).second(0).toDate())
+    setDraftDate((date) => dayjs(date).hour(h).minute(m).second(0).toDate())
   }
 
   const handleApply = () => {
-    if (minDate && dayjs.utc(draftDate).isBefore(dayjs.utc(minDate), 'day')) return
+    if (minDate && dayjs(draftDate).isBefore(dayjs(minDate), 'day')) return
     onChangeAction(draftDate)
     setOpen(false)
   }
 
   const handleReset = () => {
     const fallback = defaultValue ?? nowUtc()
-    const date = minDate && dayjs.utc(fallback).isBefore(dayjs.utc(minDate), 'day')
+    const date = minDate && dayjs(fallback).isBefore(dayjs(minDate), 'day')
       ? minDate
       : fallback
     setDraftDate(date)
-    setTimeInput(dayjs.utc(date).format('HH:mm'))
+    setTimeInput(dayjs(date).format('HH:mm'))
   }
 
   return (
@@ -113,12 +113,12 @@ export function DateTimePicker({
               {formatDate(value, dateFormat)}
             </span>
             <span className="flex h-10 w-28 items-center rounded-lg border border-input bg-transparent px-3 text-sm hover:border-primary">
-              {dayjs.utc(value).format('HH:mm')}
+              {dayjs(value).format('HH:mm')}
             </span>
           </button>
         )}
       >
-        <MiniCalendar selected={draftDate} onDayClickAction={handleDayClick}
+        <MiniCalendar selected={draftDate} onDayClickAction={handleDayClick} localTime
           disablePast={!allowPastDates} minDate={minDate} />
         <div className="mb-3.5 mt-3">
           <label htmlFor={timeInputId} className="mb-1.5 block text-xs text-muted-foreground">

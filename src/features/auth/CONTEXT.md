@@ -60,12 +60,15 @@ Cookie/session rules:
 - `accessToken`: httpOnly, 15 minutes, path `/`.
 - `refreshToken`: httpOnly, seven days, path `/`.
 - Locale and appearance are fetched from `/user/me` during login; invalid/missing
-  values fall back to `de` and `light`.
+  values fall back to Vietnamese (`vi`) and `light`.
 - Reactive refresh handles expired access tokens on 401 status. Concurrent requests
   wait on the same refresh queue.
 - Failed GET requests are retried once after successful refresh.
 - Logout is best-effort against core, always clears local/server cookies via Next.js
   endpoints, broadcasts `LOGOUT`, then performs a full redirect to the locale login page.
+- The authenticated shell places the brand logo in the sidebar header and the logout
+  action in the sidebar footer. The avatar menu keeps the user-settings link; both shell
+  entry points use the existing `clientLogout()` flow.
 
 ### Invite registration
 
@@ -125,7 +128,7 @@ forgot-password,accept-invite,registration-token,verify-invite-user}/route.ts`.
   preferences.
 - Login error codes and attempts remaining are mapped in the Next login handler;
   preserve this behavior when changing response handling.
-- Add new backend error codes to both `messages/en.json` and `messages/de.json`.
+- Add new backend error codes to both `messages/en.json` and `messages/vi.json`.
 
 `useMe()` maps profile data into `useUserStore`, preferring top-level
 `permissions` over `role.permissions`, and maps missing permissions/navbar to an

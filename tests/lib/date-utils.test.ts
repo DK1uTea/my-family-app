@@ -1,23 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { formatDate, nowUtc, toApiDate } from '@/lib/date-utils';
 
-/**
- * These tests pin the project's "Germany stored as UTC+0" convention:
- * a timestamp of 14:00Z means 14:00 Germany time and must render as 14:00
- * regardless of the machine's timezone. If one of these ever fails on a
- * teammate's machine, the offset leaked back in.
- */
+/** Pin timestamp display to the viewer's timezone, independently of the host machine. */
 describe('formatDate', () => {
   const DB_DATE = '2026-07-29T14:00:00Z';
+
+  beforeAll(() => vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh'));
+  afterAll(() => vi.unstubAllEnvs());
 
   it('renders a DB date in the user-selected format without shifting the day', () => {
     expect(formatDate(DB_DATE, 'DD/MM/YYYY')).toBe('29/07/2026');
     expect(formatDate(DB_DATE, 'MM-DD-YYYY')).toBe('07-29-2026');
   });
 
-  it('appends the wall-clock time unchanged when includeTime is set', () => {
-    expect(formatDate(DB_DATE, 'DD/MM/YYYY', true)).toBe('29/07/2026 14:00');
+  it('converts a UTC timestamp to the viewer timezone when includeTime is set', () => {
+    expect(formatDate(DB_DATE, 'DD/MM/YYYY', true)).toBe('29/07/2026 21:00');
   });
 
   it('returns an empty string for a missing date instead of throwing', () => {

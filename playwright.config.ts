@@ -13,8 +13,8 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
  * E2E tests only — `e2e/**\/*.spec.ts`.
  * Unit/component tests live in `tests/**\/*.test.ts(x)` and run under Vitest.
  *
- * The app is locale-prefixed (default `de`), so every path in a test must be
- * written with its prefix: `/de/login`, `/en/dashboards`.
+ * The app is locale-prefixed (default `vi`), so every path in a test must be
+ * written with its prefix: `/vi/login`, `/en/dashboards`.
  *
  * Every spec hits the real backend — there is no mocked project. Sign-ins rely on
  * `SKIP_CAPTCHA_VERIFICATION=true` (see `src/lib/verify-captcha.ts`) so a headless
@@ -55,7 +55,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    locale: 'de-DE',
+    locale: 'vi-VN',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

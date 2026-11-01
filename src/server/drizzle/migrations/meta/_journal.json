@@ -15,6 +15,13 @@
       "when": 1793259372680,
       "tag": "0001_brown_stick",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793506259304,
+      "tag": "0002_cooing_anthem",
+      "breakpoints": true
     }
   ]
 }

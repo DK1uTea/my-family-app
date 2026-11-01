@@ -30,8 +30,11 @@ between HTTP handlers, domain use cases, persistence contracts, and external pro
   runtime queries. Drizzle schemas live under `src/server/drizzle/schema/` and migrations under
   `src/server/drizzle/migrations/`; use pooled
   `DATABASE_URL` at runtime and `DATABASE_URL_UNPOOLED` for direct migration connections.
-- Swagger UI is served at `/api/docs` from the OpenAPI document at `/api/openapi.json`.
-  In production both endpoints are disabled unless `API_DOCS_ENABLED=true`.
+- API operations are documented in `src/server/openapi/contracts.ts` from Zod request and
+  response schemas. `pnpm openapi:generate` writes the OpenAPI document consumed by
+  `/api/openapi.json` and `/api/docs`; `pnpm openapi:check` checks route coverage and drift.
+  The external catch-all proxy is excluded because its upstream contract is not owned here.
+  In production both docs endpoints are disabled unless `API_DOCS_ENABLED=true`.
 - Keep the existing auth routes and external API catch-all working until their migration
   is separately implemented and verified.
 - Keep each backend domain's API and behavior spec beside its module in
@@ -61,13 +64,26 @@ src/server/drizzle/migrations/     # Generated database migrations
 - Always keep HTTP serialization in Route Handlers and business rules in server modules.
 - Always keep secrets server-side and outside version control.
 - Ask before changing existing auth behavior, cookie semantics, or endpoint contracts.
+- Every first-party Route Handler method must have an API contract. Update its Zod schemas,
+  contract metadata, and generated OpenAPI artifact in the same change.
+- Schema changes require a reviewed Drizzle migration committed with the schema. Developers
+  apply it locally with `pnpm db:migrate`; CI checks migration consistency and schema drift.
+  Deployment must apply migrations once, serially, before app rollout using the direct URL.
 - Never import server-only code into client components or put SQL in route handlers.
 - Do not add NestJS runtime/decorators. Compose dependencies with TypeScript factories,
   preserving the controller/service/repository/data-provider responsibilities.
 
 ## Setup commands
 
-- `pnpm db:generate` generates SQL migrations from Drizzle schemas.
+- `pnpm db:generate -- --name <short_snake_case_name>` generates timestamped SQL migrations
+  from Drizzle schemas. New filenames use `YYYYMMDDHHmmss_<name>.sql` in UTC; preserve old
+  migration filenames and keep SQL, snapshots, and `_journal.json` in the same commit.
 - `pnpm db:migrate` applies migrations using direct URL.
+- `pnpm db:check` validates Drizzle migration history consistency.
+- `pnpm db:seed` creates a local super admin from explicit credentials in `.env.local`;
+  it requires `NEON_BRANCH=development`, never uses a committed/default password, and is
+  disabled under `NODE_ENV=production`.
 - `pnpm db:push` pushes schema changes directly to the database during prototyping.
 - `pnpm db:studio` opens Drizzle Studio.
+- `pnpm openapi:generate` updates the generated API document.
+- `pnpm openapi:check` verifies route coverage and generated-document consistency.
