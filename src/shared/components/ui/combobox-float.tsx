@@ -159,7 +159,7 @@ export function ComboboxFloat({
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        <label id={labelId} className={labelCls}>{label}</label>
+        <span id={labelId} className={labelCls}>{label}</span>
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}

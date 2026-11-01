@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useDropzone, type Accept } from 'react-dropzone'
+import { useTranslations } from 'next-intl'
 import { FileIcon, ImageIcon, Loader2Icon, UploadIcon, VideoIcon, XIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -101,6 +102,7 @@ export function MediaUpload({
   errorTooManyFilesText = 'Too many files',
   className,
 }: Props) {
+  const tCommon = useTranslations('common')
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [galleryIndex, setGalleryIndex] = useState(0)
 
@@ -170,36 +172,37 @@ export function MediaUpload({
         <div className="min-w-0 space-y-2">
           {value.map((url, i) => {
             const kind = fileKinds?.[i] ?? getFileKind(url)
+            const fileName = fileNames?.[i] ?? getFilename(url)
             return (
               <div
                 key={`${url}-${i}`}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleRowClick(url, i)}
-                onKeyDown={(e) => e.key === 'Enter' && handleRowClick(url, i)}
-                className="flex min-w-0 max-w-full cursor-pointer items-center gap-3 rounded-lg border border-border px-3 py-2 transition-colors hover:bg-muted/50"
+                className="flex min-w-0 max-w-full items-center gap-3 rounded-lg border border-border px-3 py-2 transition-colors hover:bg-muted/50"
               >
-                {kind === 'image' ? (
-                  <img
-                    src={url}
-                    alt=""
-                    className="size-10 shrink-0 rounded object-cover"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                  />
-                ) : kind === 'video' ? (
-                  <VideoIcon className="size-10 shrink-0 text-muted-foreground" />
-                ) : (
-                  <FileIcon className="size-10 shrink-0 text-muted-foreground" />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-muted-foreground">
-                    {fileNames?.[i] ?? getFilename(url)}
-                  </p>
-                  {fileMeta?.[i]}
-                </div>
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); onRemove(i) }}
+                  onClick={() => handleRowClick(url, i)}
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {kind === 'image' ? (
+                    <img
+                      src={url}
+                      alt=""
+                      className="size-10 shrink-0 rounded object-cover"
+                    />
+                  ) : kind === 'video' ? (
+                    <VideoIcon className="size-10 shrink-0 text-muted-foreground" />
+                  ) : (
+                    <FileIcon className="size-10 shrink-0 text-muted-foreground" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-muted-foreground">{fileName}</p>
+                    {fileMeta?.[i]}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  aria-label={`${tCommon('uploadDropzone.remove')} ${fileName}`}
+                  onClick={() => onRemove(i)}
                   className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
                 >
                   <XIcon className="size-4" />

@@ -89,6 +89,7 @@ function SelectFloat({
     isFloating ? 'translate-y-2 text-[11px]' : 'translate-y-4.25 text-[13px]',
     error ? 'text-destructive' : 'text-muted-foreground',
   )
+  const labelId = `${triggerId}-label`
 
   const chevronCls = cn(
     'pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-transform duration-200',
@@ -106,6 +107,7 @@ function SelectFloat({
           <Select value={currentValue} onValueChange={handleValueChange} open={open} onOpenChange={setOpen} disabled={disabled}>
             <SelectTrigger
               id={triggerId}
+              aria-labelledby={labelId}
               className={cn('h-full! w-full rounded-none border-0 bg-transparent px-3 pr-9 text-sm font-medium shadow-none ring-0 focus-visible:ring-0 [&>svg]:hidden', isFloating ? 'pt-5 pb-1' : 'py-0')}
             >
               <SelectValue />
@@ -116,7 +118,7 @@ function SelectFloat({
               {loadingMore && <LoadingIcon className="mx-auto my-2 size-5" />}
             </SelectContent>
           </Select>
-          <label htmlFor={triggerId} className={labelCls}>{label}</label>
+          <span id={labelId} className={labelCls}>{label}</span>
           <ChevronDownIcon className={chevronCls} />
         </div>
         {error && <p className="text-[13px] text-destructive">{error}</p>}
@@ -135,26 +137,23 @@ function SelectFloat({
 
   const selectedLabels = currentValues.map(v => options.find(o => o.value === v)?.label ?? v)
   const displayText = selectedLabels.join(', ')
-  const labelId = `${triggerId}-label`
-
   return (
     <div className={cn('flex flex-col gap-1', className)}>
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild disabled={disabled}>
-          <div
+          <button
+            type="button"
             translate="no"
-            className={cn('cursor-pointer', containerCls)}
-            role="combobox"
+            className={cn('cursor-pointer appearance-none text-left', containerCls)}
+            aria-label={label}
             aria-expanded={open}
-            aria-labelledby={labelId}
-            aria-haspopup="listbox"
           >
             <div className={cn('flex h-full w-full items-center px-3 pr-9 text-sm font-medium', isFloating && 'pt-5 pb-1')}>
               {displayText && <span className="truncate">{displayText}</span>}
             </div>
-            <label id={labelId} className={labelCls}>{label}</label>
+            <span className={labelCls}>{label}</span>
             <ChevronDownIcon className={chevronCls} />
-          </div>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className="_custom-scroll max-h-60 min-w-(--radix-dropdown-menu-trigger-width) overflow-y-auto p-1"

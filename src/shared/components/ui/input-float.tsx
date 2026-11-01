@@ -36,9 +36,10 @@ function InputFloat({
 
   return (
     <div className="flex flex-col gap-1">
-      <div
+      <label
+        htmlFor={inputId}
         className={cn(
-          'relative h-13.5 w-full rounded-input-float border bg-background transition-colors overflow-hidden',
+          'relative block h-13.5 w-full rounded-input-float border bg-background transition-colors overflow-hidden',
           focused
             ? error ? 'border-destructive' : 'border-primary'
             : error ? 'border-destructive' : 'border-input hover:border-primary',
@@ -63,8 +64,7 @@ function InputFloat({
             className,
           )}
         />
-        <label
-          htmlFor={inputId}
+        <span
           className={cn(
             'pointer-events-none absolute top-0 left-3 select-none transition-all duration-200',
             isFloating ? 'translate-y-2 text-[11px]' : 'translate-y-4.25 text-[13px]',
@@ -72,8 +72,8 @@ function InputFloat({
           )}
         >
           {label}
-        </label>
-      </div>
+        </span>
+      </label>
       {error && (
         <p id={errorId} role="alert" className="text-[13px] text-destructive">
           {error}
