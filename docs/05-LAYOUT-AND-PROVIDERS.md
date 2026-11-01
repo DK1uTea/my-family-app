@@ -51,7 +51,7 @@ Built on the `SidebarProvider` / `Sidebar` component family from `src/shared/com
 `next-intl` uses `localePrefix: 'always'` — every route has an explicit locale segment:
 
 ```
-/de/dashboards    ← German (default locale)
+/vi/dashboards    ← Vietnamese (default locale)
 /en/dashboards    ← English
 ```
 
@@ -61,8 +61,8 @@ The `createNavigation()` helper exports locale-aware `Link`, `useRouter`, and `u
 // ✅ Always import from @/i18n/navigation
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 
-<Link href="/dashboards">Dashboard</Link>  // renders /de/dashboards automatically
-router.push('/settings');                 // navigates to /de/settings
+<Link href="/dashboards">Dashboard</Link>  // renders /vi/dashboards automatically
+router.push('/settings');                 // navigates to /vi/settings
 const pathname = usePathname();           // /dashboards (no locale prefix)
 
 // ❌ Never import from next/navigation directly

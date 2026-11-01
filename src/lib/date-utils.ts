@@ -1,13 +1,11 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import timezonePlugin from 'dayjs/plugin/timezone'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/de'
+import 'dayjs/locale/vi'
 import 'dayjs/locale/en'
 
 dayjs.extend(utc)
-dayjs.extend(timezonePlugin)
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
 
@@ -27,9 +25,9 @@ export function nowUtc(): Date {
 }
 
 /**
- * Formats a DB date using the user's preferred date format.
- * Pass includeTime=true to append HH:mm.
- * Always use this instead of calling dayjs.utc(x).format(...) directly.
+ * Formats a timestamp using the browser's local timezone and the user's
+ * preferred date format. Pass includeTime=true to append the local HH:mm.
+ * Always use this instead of formatting timestamps with dayjs.utc(...).
  */
 export function formatDate(
   date: Date | string | null | undefined,
@@ -39,19 +37,21 @@ export function formatDate(
   if (!date) return ''
   const activeFormat = dateFormat || DEFAULT_DATE_FORMAT
   const fmt = includeTime ? `${activeFormat} HH:mm` : activeFormat
-  return dayjs.utc(date).format(fmt)
+  return dayjs(date).format(fmt)
+}
+
+/** Formats a date-only calendar value without applying a timezone offset. */
+export function formatCalendarDate(
+  date: Date | string | null | undefined,
+  dateFormat: DateFormat,
+): string {
+  if (!date) return ''
+  return dayjs.utc(date).format(dateFormat || DEFAULT_DATE_FORMAT)
 }
 
 /**
- * Serializes a picked date for the API — sends the value exactly as picked,
- * with no browser timezone offset applied.
- *
- * Future: when user.timezone is available, pass it here so that
- * "14:00 in user's timezone" is correctly converted to UTC before sending.
+ * Serializes a picked local date/time as its UTC instant for the API.
  */
-export function toApiDate(date: Date, userTimezone?: string): string {
-  if (userTimezone) {
-    return dayjs.tz(dayjs.utc(date).format('YYYY-MM-DDTHH:mm:ss'), userTimezone).utc().toISOString()
-  }
-  return dayjs.utc(date).toISOString()
+export function toApiDate(date: Date): string {
+  return dayjs(date).toISOString()
 }

@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import de from '@/messages/de.json';
+import vi from '@/messages/vi.json';
 
 import { inactiveCredentials, lockedCredentials } from '../../shared/session';
 import { PRIMARY_EMAIL, WRONG_PASSWORD } from './login.data';
-import { DE_ERRORS, LoginPage } from './login.page';
+import { LOGIN_ERRORS, LoginPage } from './login.page';
 
 /**
  * Login — server error branches, against the real backend.
@@ -19,7 +19,7 @@ import { DE_ERRORS, LoginPage } from './login.page';
 /** Mirrors `getErrorMessage()` in src/lib/get-error-message.ts: dots become underscores. */
 function errorMessage(code: string) {
   const key = code.replace(/\./g, '_');
-  return (de.errors as Record<string, string>)[key] ?? de.errors.default;
+  return (vi.errors as Record<string, string>)[key] ?? vi.errors.default;
 }
 
 test.describe('login errors', () => {
@@ -39,9 +39,9 @@ test.describe('login errors', () => {
     );
 
     await expect(
-      login.passwordError(DE_ERRORS.attemptsRemaining(body.attemptsRemaining)),
+      login.passwordError(LOGIN_ERRORS.attemptsRemaining(body.attemptsRemaining)),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/de\/login/);
+    await expect(page).toHaveURL(/\/vi\/login/);
   });
 
   test('reports the lockout duration in minutes when the account is locked', async ({ page }) => {
@@ -65,7 +65,7 @@ test.describe('login errors', () => {
     );
     const minutes = Math.ceil(body.loginBlockDuration / 60);
 
-    await expect(login.passwordError(DE_ERRORS.accountLocked(minutes))).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.accountLocked(minutes))).toBeVisible();
   });
 
   test('toasts a translated message for an inactive account', async ({ page }) => {
@@ -102,7 +102,7 @@ test.describe('login errors', () => {
 
     // The form polls for reCAPTCHA for ~5s before giving up — it never reaches the
     // backend, so the wrong password above never gets submitted.
-    await expect(login.toast(DE_ERRORS.captchaNotReady)).toBeVisible({ timeout: 15_000 });
+    await expect(login.toast(LOGIN_ERRORS.captchaNotReady)).toBeVisible({ timeout: 15_000 });
     expect(loginRequestSeen).toBe(false);
   });
 });

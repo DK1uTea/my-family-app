@@ -105,7 +105,7 @@ export function useMe() {
 
 function normalizeLocale(locale: string | null | undefined): AppLocale {
   const normalized = locale?.toLowerCase();
-  return normalized === "en" || normalized === "de" ? normalized : "de";
+  return normalized === "en" || normalized === "vi" ? normalized : "vi";
 }
 
 function normalizeAppearance(

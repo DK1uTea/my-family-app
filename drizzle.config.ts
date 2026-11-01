@@ -7,6 +7,9 @@ config({ path: ".env" });
 export default defineConfig({
   schema: "./src/server/drizzle/schema/index.ts",
   out: "./src/server/drizzle/migrations",
+  migrations: {
+    prefix: "timestamp",
+  },
   dialect: "postgresql",
   dbCredentials: {
     url:

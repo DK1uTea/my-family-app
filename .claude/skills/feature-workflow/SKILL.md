@@ -46,7 +46,7 @@ one after the other — full split in `.claude/skills/test-driven-development/SK
 | Requirement changed on existing code | QA updates the test encoding the old behaviour; dev updates the implementation | SPEC, unless the change is large |
 | Bug report | QA reproduces it (the Prove-It pattern); dev fixes it against the report | SPEC |
 | Visual-only restyle, no behaviour change | VERIFY | SPEC, dev/QA test authorship |
-| Copy / translation key only | SYNC (`en.json` + `de.json` together) | everything else |
+| Copy / translation key only | SYNC (`en.json` + `vi.json` together) | everything else |
 | Typo, comment, config | just do it | everything else |
 
 When in doubt, spend the 15 minutes on a spec. Skipping it is the expensive mistake.
@@ -111,12 +111,67 @@ against whatever QA test cases exist at handoff time — with any gap named expl
 **Gate (QA):** every behaviour bullet has a test case that failed for the right reason
 before being confirmed against the implementation.
 
+## Backend Delivery: Database and OpenAPI
+
+For changes to a first-party API or Drizzle schema, also follow
+`.agents/skills/neon-postgres/SKILL.md` and `src/server/README.md`. Keep the approved
+backend contract in `src/server/SPEC.md` or the domain's `SPEC.md` current. This is an
+additional delivery path inside DEV/QA, not a replacement for test ownership.
+
+### Database schema change
+
+1. Edit `src/server/drizzle/schema/` and generate a migration with `pnpm db:generate`.
+2. Review the generated SQL, snapshots, and `meta/_journal.json`. Commit all generated
+   migration files with the schema change; never rewrite a migration that has been applied.
+3. Verify the target Neon branch with `neon status`. Apply locally with
+   `pnpm db:migrate`; this uses `DATABASE_URL_UNPOOLED` when configured. Check migration
+   history with `pnpm db:check`.
+4. CI runs `pnpm db:check`, regenerates migrations, and fails if generation changes the
+   committed migration directory. CI validates; it does not apply migrations to production.
+5. Deployment must apply `pnpm db:migrate` once, serially, before the new app version serves
+   traffic, using the direct connection secret. A failed migration stops rollout. Never run
+   migration independently in each replica or automatically drop/reset a schema.
+
+Developer pull flow: pull the committed schema and migration, verify the configured local
+database, then run `pnpm db:migrate`. Pulling code itself never mutates a database. The repo
+currently has CI validation but no deploy workflow; add the migration step to the selected
+deployment platform before claiming production migration automation is active.
+
+`pnpm db:push` is for disposable prototyping only, never production. Test risky migrations on
+a Neon development branch with production-like data before applying them to production.
+
+### API and Swagger change
+
+Every first-party API Route Handler method must match an operation in
+`src/server/openapi/contracts.ts`. The contract records the method, path, Zod request and
+response schemas, summary, and documented responses. The generator compares contracts with
+the Next.js API route tree (excluding the external catch-all proxy and docs endpoints), then
+produces `src/server/openapi/generated.json`.
+
+When adding or changing a route, update the contract in the same change and run:
+
+```bash
+pnpm openapi:generate
+pnpm openapi:check
+```
+
+Review the generated JSON and verify the operation at `/api/openapi.json` and `/api/docs`.
+CI runs `pnpm openapi:check`, which fails for a missing route contract or stale generated
+document. Do not document unknown upstream proxy payloads as if this app owns their schema.
+
+### Backend verification
+
+Run `pnpm db:check`, `pnpm openapi:check`, `pnpm typecheck`, `pnpm lint`, and `pnpm test`.
+Never run `pnpm db:migrate` against a shared/production database as an incidental test; verify
+the active branch and target first. QA owns tests for new API behavior and migration-related
+application behavior, following the standard QA/dev split above.
+
 ## Stage 3 — VERIFY
 
 → `.claude/skills/browser-verification-playwright/SKILL.md`
 
 Unit tests do not prove a page renders. Drive the real browser, check the console is clean,
-check `/de/` and `/en/`, check dark and light. Promoting an observed flow into
+check `/vi/` and `/en/`, check dark and light. Promoting an observed flow into
 `e2e/*.spec.ts` is QA's write, same as any other test file — dev verifies visually here but
 does not add the spec file.
 
@@ -130,7 +185,7 @@ Fan out everything that has more than one home:
 
 - Did you learn a rule worth enforcing? → `CLAUDE.md` **and** `.github/copilot-instructions.md`
   (and `AGENTS.md` if it is workflow-level)
-- New i18n keys? → `en.json` **and** `de.json`
+- New i18n keys? → `en.json` **and** `vi.json`
 - New backend `error_code`? → the `errors` namespace in both locale files
 - New shared component? → a section in `(public)/components/_sections/` **and** its
   registration in that page
@@ -152,7 +207,7 @@ Not done until every one of these is true:
 - [ ] `pnpm build` succeeds
 - [ ] Critical flows have an `e2e/*.spec.ts` (QA-authored) and `pnpm test:e2e` passes
 - [ ] Browser-verified in both locales and both themes, console clean
-- [ ] `en.json` and `de.json` both updated
+- [ ] `en.json` and `vi.json` both updated
 - [ ] Every mirrored file is in sync
 - [ ] Nothing was skipped silently — anything left out is stated explicitly, with why
 

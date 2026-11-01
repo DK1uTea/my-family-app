@@ -4,7 +4,7 @@ import { scanA11y } from '../../shared/a11y';
 
 import { watchConsole } from '../../shared/console';
 import { PRIMARY_EMAIL, PRIMARY_PASSWORD, WRONG_PASSWORD } from './login.data';
-import { DE, DE_ERRORS, LoginPage } from './login.page';
+import { LOGIN_COPY, LOGIN_ERRORS, LoginPage } from './login.page';
 
 /**
  * Accessibility contract for the login page.
@@ -31,7 +31,7 @@ test.describe('login page accessibility', () => {
     await login.goto();
 
     await login.submit.click();
-    await expect(login.passwordError(DE_ERRORS.passwordRequired)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.passwordRequired)).toBeVisible();
 
     const results = await scanA11y(page);
 
@@ -46,8 +46,8 @@ test.describe('login page accessibility', () => {
     // by role + name proves the name exists, and the label[for] -> id pair proves where
     // it comes from. The placeholder stays as a hint, which is all it may ever be.
     for (const [field, name] of [
-      [login.email, DE.emailLabel],
-      [login.password, DE.passwordLabel],
+      [login.email, LOGIN_COPY.emailLabel],
+      [login.password, LOGIN_COPY.passwordLabel],
     ] as const) {
       await expect(field).toBeVisible();
       await expect(field).toHaveAttribute('required', '');
@@ -57,20 +57,20 @@ test.describe('login page accessibility', () => {
       await expect(page.locator(`label[for="${id}"]`)).toContainText(name);
     }
 
-    await expect(login.email).toHaveAttribute('placeholder', DE.emailPlaceholder);
+    await expect(login.email).toHaveAttribute('placeholder', LOGIN_COPY.emailPlaceholder);
   });
 
   test('names the password toggle and flips that name with its state', async ({ page }) => {
     const login = new LoginPage(page);
     await login.goto();
 
-    const toggle = page.getByRole('button', { name: DE.showPassword });
+    const toggle = page.getByRole('button', { name: LOGIN_COPY.showPassword });
     await expect(toggle).toBeVisible();
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
 
     await toggle.click();
 
-    const pressed = page.getByRole('button', { name: DE.hidePassword });
+    const pressed = page.getByRole('button', { name: LOGIN_COPY.hidePassword });
     await expect(pressed).toHaveAttribute('aria-pressed', 'true');
   });
 
@@ -89,11 +89,11 @@ test.describe('login page accessibility', () => {
     await login.goto();
 
     await login.submit.click();
-    await expect(login.passwordError(DE_ERRORS.emailInvalid)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.emailInvalid)).toBeVisible();
 
     for (const [field, message] of [
-      [login.email, DE_ERRORS.emailInvalid],
-      [login.password, DE_ERRORS.passwordRequired],
+      [login.email, LOGIN_ERRORS.emailInvalid],
+      [login.password, LOGIN_ERRORS.passwordRequired],
     ] as const) {
       const describedBy = await field.getAttribute('aria-describedby');
       expect(describedBy, 'field must point at its error').toBeTruthy();
@@ -114,7 +114,7 @@ test.describe('login page accessibility', () => {
     // Scoped by text: sonner also mounts a role="alert" region, so a bare
     // getByRole('alert') is a strict-mode violation rather than a useful assertion.
     const liveRegion = page.getByRole('alert').filter({
-      hasText: DE_ERRORS.attemptsRemaining(body.attemptsRemaining),
+      hasText: LOGIN_ERRORS.attemptsRemaining(body.attemptsRemaining),
     });
 
     await expect(liveRegion).toBeVisible();

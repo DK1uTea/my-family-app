@@ -74,7 +74,7 @@ how every mock in the suite has to be written.
 ## Step 2 — Snapshot the page, not a screenshot
 
 ```
-browser_navigate → http://localhost:3000/de/login
+browser_navigate → http://localhost:3000/vi/login
 browser_snapshot
 ```
 
@@ -102,8 +102,8 @@ Submit the empty form. Submit a bad password. Watch `browser_network_requests` a
 `browser_network_request` bodies.
 
 **This is where you learn the real error copy.** Login's empty-email message is
-`fieldErrors.email` — *"Bitte gib eine gültige E-Mail-Adresse ein"* — not the
-`login.validation.emailRequired` key that also exists in `de.json` and looks like the
+`fieldErrors.email` — *"Vui lòng nhập địa chỉ email hợp lệ"* — not the
+`login.validation.emailRequired` key that also exists in `vi.json` and looks like the
 obvious answer. A guessed assertion would have used the dead key.
 
 > **Careful with destructive branches.** Submitting a wrong password on the login form hits
@@ -211,10 +211,10 @@ plurals are real behaviour worth guarding — `attemptsRemaining` renders *"1 Ve
 ## Locale is cookie-driven in this app
 
 `src/proxy.ts` resolves the locale from the `preferredLanguage` then `NEXT_LOCALE` cookies,
-falls back to `de`, and **rewrites any URL whose prefix disagrees**. Navigating to
-`/en/login` without a cookie lands on `/de/login`. To test English, set the cookie — see
-`setLocaleCookie` in `e2e/shared/session.ts`. Assert German copy everywhere else, because
-`de` is the default users get.
+falls back to `vi`, and **rewrites any URL whose prefix disagrees**. Navigating to
+`/en/login` without a cookie lands on `/vi/login`. To test English, set the cookie — see
+`setLocaleCookie` in `e2e/shared/session.ts`. Assert Vietnamese copy everywhere else, because
+`vi` is the default users get.
 
 ## Timing
 
@@ -277,7 +277,7 @@ agent.
 ## Red Flags
 
 - Writing a spec without having opened the page
-- Assertions on message text you found in `de.json` but never saw rendered
+- Assertions on message text you found in `vi.json` but never saw rendered
 - Mocking with the HTTP status you expected rather than the one the endpoint returns
 - An MCP session that found something and left no spec behind
 - Screenshotting when a snapshot would have answered the question
@@ -292,6 +292,6 @@ agent.
 - [ ] Mocked responses copy the real transport status **and** the real envelope shape
 - [ ] Destructive endpoints are mocked, not called
 - [ ] `browser_console_messages` returned zero errors and zero warnings
-- [ ] Both `/de/` and `/en/` were considered, and the locale cookie set where needed
+- [ ] Both `/vi/` and `/en/` were considered, and the locale cookie set where needed
 - [ ] The flow now exists as `e2e/*.spec.ts`
 - [ ] `pnpm test:e2e` passes, with the output shown

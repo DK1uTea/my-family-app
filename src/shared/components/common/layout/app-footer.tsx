@@ -51,7 +51,7 @@ export function AppFooter() {
         {/* Top: Logo + Social icons */}
         <div className="flex flex-col items-center justify-between gap-5 sm:flex-row">
           <Image
-            src="/images/logo_gray.png"
+            src="/images/logo_green.png"
             alt="Footer Logo"
             width={180}
             height={58}

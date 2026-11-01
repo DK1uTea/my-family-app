@@ -84,5 +84,5 @@ export function FeatureNameMain() {
 - `loading.tsx` exists alongside every `page.tsx`
 - `error.tsx` exists alongside every `page.tsx` — only passes `error` prop, never `reset`
 - All static text uses `useTranslations()`
-- i18n keys added to both `en.json` and `de.json`
+- i18n keys added to both `en.json` and `vi.json`
 - Max 200 lines per file; 1 component per file

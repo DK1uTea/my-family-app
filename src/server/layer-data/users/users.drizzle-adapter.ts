@@ -13,7 +13,7 @@ import type {
 } from "./users.types";
 
 const DEFAULT_PREFERENCES: UserPreferencesRecord = {
-  preferredLanguage: "de",
+  preferredLanguage: "vi",
   appearance: "light",
   currency: "EUR",
   dateFormat: "DD/MM/YYYY",
@@ -39,7 +39,7 @@ export class DrizzleUsersRepository implements UsersRepository {
     const pref = prefRows[0];
     const preferences: UserPreferencesRecord = {
       preferredLanguage:
-        (pref?.preferredLanguage as "de" | "en") ??
+        (pref?.preferredLanguage as "vi" | "en") ??
         DEFAULT_PREFERENCES.preferredLanguage,
       appearance:
         (pref?.appearance as "light" | "dark") ??
@@ -86,7 +86,7 @@ export class DrizzleUsersRepository implements UsersRepository {
         .insert(userPreferences)
         .values({
           userId,
-          preferredLanguage: update.preferences.preferredLanguage ?? "de",
+          preferredLanguage: update.preferences.preferredLanguage ?? "vi",
           appearance: update.preferences.appearance ?? "light",
           currency: update.preferences.currency ?? "EUR",
           dateFormat: update.preferences.dateFormat ?? "DD/MM/YYYY",

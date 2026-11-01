@@ -1,4 +1,4 @@
-# Ft My Family App
+# My Family App
 
 Full-stack family app built with Next.js App Router. The repository contains both the UI
 and its first-party server code; Next.js Route Handlers are the HTTP boundary. There is no

@@ -1,6 +1,6 @@
 # i18n Rules
 
-All static text goes through `useTranslations()` from next-intl. Locale is in the URL prefix (`/de/dashboards`, `/en/settings`). Default locale: `de`.
+All static text goes through `useTranslations()` from next-intl. Locale is in the URL prefix (`/vi/dashboards`, `/en/settings`). Default locale: `vi`.
 
 ## Routing Structure
 
@@ -18,8 +18,8 @@ src/app/[locale]/
 ```tsx
 import { Link, useRouter, usePathname, redirect } from '@/i18n/navigation';
 
-<Link href="/dashboards">Dashboard</Link>  // renders /de/dashboards automatically
-router.push('/settings');                 // navigates to /de/settings
+<Link href="/dashboards">Dashboard</Link>  // renders /vi/dashboards automatically
+router.push('/settings');                 // navigates to /vi/settings
 const pathname = usePathname();           // returns /dashboards (no locale prefix)
 ```
 
@@ -30,7 +30,7 @@ Never import from `next/navigation` directly.
 1. Identify all static strings
 2. Choose namespace (feature name in camelCase: `userManagement`, or `common`)
 3. Add keys to `src/messages/en.json`
-4. Add same keys to `src/messages/de.json` with German translations
+4. Add same keys to `src/messages/vi.json` with Vietnamese translations
 5. Use `useTranslations('namespace')` in the component
 
 ```tsx
@@ -85,8 +85,8 @@ featureName.detail.tab<Name>   → Tab labels
 ## Rules
 
 - No hardcoded strings — every visible string through `t()`
-- Always update both `en.json` and `de.json`
+- Always update both `en.json` and `vi.json`
 - Namespace = feature name in camelCase
-- `usePathname()` returns path without locale (`/dashboards`, not `/de/dashboards`)
-- `useRouter().push('/path')` auto-adds locale — never manually prefix `/de/`
+- `usePathname()` returns path without locale (`/dashboards`, not `/vi/dashboards`)
+- `useRouter().push('/path')` auto-adds locale — never manually prefix `/vi/`
 - Never import `useRouter` from `next/navigation` — use `@/i18n/navigation`

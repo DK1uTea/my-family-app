@@ -63,7 +63,7 @@ pass. Full rules: `.claude/skills/accessibility/SKILL.md`.
 - **Errors get `aria-describedby` → a `role="alert"` node**, plus `aria-invalid`.
 - **Contrast is NOT enforced** — the per-tenant theme owns the palette; never fix, test or report it
   (`/60`) and never a raw palette colour to make text look secondary.
-- New `aria-label` strings go into `en.json` **and** `de.json`.
+- New `aria-label` strings go into `en.json` **and** `vi.json`.
 
 Enforcement is a ratchet: `eslint-plugin-jsx-a11y` recommended runs at `warn` over ~78
 pre-existing violations, rules already at zero run at `error`, and `src/features/auth/**`
@@ -146,6 +146,12 @@ pnpm test:e2e:report      # open the last HTML report
 pnpm e2e:new <module>     # scaffold a module folder (--public for no-auth pages)
 
 pnpm test:all             # everything
+pnpm db:generate          # generate a Drizzle migration from schema changes
+pnpm db:migrate           # apply pending migrations to the configured database
+pnpm db:check             # check Drizzle migration history
+pnpm db:seed              # create the local super admin from .env.local credentials
+pnpm openapi:generate     # generate OpenAPI JSON from route contracts
+pnpm openapi:check        # verify route coverage and generated OpenAPI JSON
 ```
 
 This is a **pnpm** repo. Never guess `npm test` or `yarn test`.
@@ -236,7 +242,7 @@ Reference: `e2e/modules/user-settings/`.
 Three traps that bite every newcomer:
 
 1. `src/app/api/auth/*` always answers **HTTP 200** with the real status inside the envelope.
-2. The **locale comes from cookies, not the URL** (`/en/login` without a cookie lands on `/de/login`).
+2. The **locale comes from cookies, not the URL**; without a locale cookie, the app defaults to `/vi/`.
 3. A real account with no `role.navbar` entries **hides every non-`alwaysShow` module** —
    the stores read `null` as "allow everything" but `[]` as "allow nothing". That's the app
    working correctly, not a bug; use `restrictedCredentials()` to test gating deliberately.
@@ -249,7 +255,7 @@ Three traps that bite every newcomer:
 | `Neon` | `.mcp.json` + `.vscode/mcp.json` | Manage the linked Neon project and Postgres service through OAuth |
 
 Runs `npx -y @playwright/mcp@latest --isolated --browser chrome`. Start `pnpm dev` yourself
-before an MCP session. Every path needs its locale prefix: `/de/login`, `/en/dashboards`.
+before an MCP session. Every path needs its locale prefix: `/vi/login`, `/en/dashboards`.
 
 ## Hard Constraints
 
@@ -260,7 +266,14 @@ directly. Compose with TypeScript factories, not NestJS. Drizzle schemas live in
 `src/server/drizzle/schema/` and migrations in
 `src/server/drizzle/migrations/`.
 
-Use `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:push`, and `pnpm db:studio` for Drizzle tasks. API docs are at
+Use `pnpm db:generate -- --name <short_snake_case_name>` to create a migration named
+`YYYYMMDDHHmmss_<name>.sql` (UTC timestamp). Review and commit it with the schema, snapshots,
+and journal; keep historical filenames unchanged. Then run `pnpm db:migrate`.
+`pnpm db:check` validates migration history; CI checks schema drift. `pnpm db:seed` creates a
+local super admin from explicit `.env.local` credentials; target development only. For API
+changes, update `src/server/openapi/contracts.ts` and run
+`pnpm openapi:generate` then `pnpm openapi:check`. `pnpm db:push` is for prototyping only.
+Full instructions: `src/server/README.md`. API docs are at
 
 `/api/docs`; the OpenAPI source endpoint is `/api/openapi.json`.
 
@@ -268,12 +281,12 @@ The full list is in `CLAUDE.md`. These are the ones that break the build or the 
 
 - **Never `import { useRouter } from 'next/navigation'`** — use `@/i18n/navigation`. ESLint enforces it.
 - **Never `import dayjs from 'dayjs'`** — use `import { dayjs } from '@/lib/date-utils'`. ESLint enforces it.
-- **Never `new Date()`** for "now" — use `nowUtc()`. All DB timestamps are Germany-local stored as UTC+0.
+- **Never `new Date()`** for "now" — use `nowUtc()`. API timestamps are UTC instants; display them in the viewer's browser/device timezone with `formatDate()`.
 - **No `useMemo` / `useCallback` / `memo` / `forwardRef`** — React Compiler is on.
 - **`useState` is never the answer for search, filters, pagination or sort** — use nuqs `useQueryStates`.
 - **Guard every API array before `.map()`** with `Array.isArray()` — the backend returns `{}` for empty lists.
 - **Optional-chain every nested API object** — relations come back `null` regardless of the TS type.
-- **Update `en.json` and `de.json` together.** Default locale is `de`.
+- **Update `en.json` and `vi.json` together.** Supported locales are `en` and `vi`; default locale is `vi`.
 - **No hardcoded strings or colors in JSX** — `useTranslations()` and semantic tokens only.
 - **Max 200 lines per file. One component per file. Kebab-case filenames.**
 

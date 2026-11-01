@@ -1,5 +1,6 @@
 {
   "common": {
+    "logoAlt": "My Family App logo",
     "sessionExpired": "Your session has expired. Please log in again.",
     "welcome": "Welcome to Next.js!",
     "searchPlaceholder": "Search...",
@@ -1394,8 +1395,8 @@
     "USER_CREATE_FAILED": "Failed to create user."
   },
   "footer": {
-    "copyright": "© {year} Ft My Family App.",
-    "copyrightCocaCola": "© {year} Ft My Family App.",
+    "copyright": "© {year} My Family App.",
+    "copyrightCocaCola": "© {year} My Family App.",
     "support": "Help",
     "supportLink": "Support",
     "privacyPolicy": "Privacy Policy",
@@ -2035,7 +2036,7 @@
     "phonePlaceholder": "+49 123 456789",
     "addressPlaceholder": "eg. 123 Main St, Munich, 80331, Germany",
     "languageEnglish": "English",
-    "languageGerman": "German",
+    "languageVietnamese": "Vietnamese",
     "user": "User",
     "name": "Name",
     "status": "Status",

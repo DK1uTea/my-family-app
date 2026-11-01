@@ -22,7 +22,7 @@ test.describe('login flow', () => {
     await expect(login.rememberMe).toBeVisible();
     await expect(login.rememberMe).not.toBeChecked();
     await expect(login.submit).toBeEnabled();
-    await expect(login.forgotPasswordLink).toHaveAttribute('href', '/de/forgot-password');
+    await expect(login.forgotPasswordLink).toHaveAttribute('href', '/vi/forgot-password');
   });
 
   test('toggles the password between hidden and visible', async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe('login flow', () => {
     });
     expect(typeof payload.captchaToken).toBe('string');
 
-    await page.waitForURL(/\/(de|en)\/dashboards/, { timeout: 30_000 });
+    await page.waitForURL(/\/(vi|en)\/dashboards/, { timeout: 30_000 });
 
     // The real handler sets the cookies `src/proxy.ts` gates private routes on.
     const cookieNames = (await page.context().cookies()).map((cookie) => cookie.name);
@@ -74,10 +74,10 @@ test.describe('login flow', () => {
     page,
   }) => {
     const login = new LoginPage(page);
-    await login.goto('?redirectTo=/de/user-settings');
+    await login.goto('?redirectTo=/vi/user-settings');
 
     await login.submitWith(PRIMARY_EMAIL, PRIMARY_PASSWORD);
 
-    await page.waitForURL(/\/de\/user-settings/, { timeout: 30_000 });
+    await page.waitForURL(/\/vi\/user-settings/, { timeout: 30_000 });
   });
 });

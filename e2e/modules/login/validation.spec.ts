@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { PRIMARY_EMAIL, PRIMARY_PASSWORD } from './login.data';
-import { DE_ERRORS, LoginPage, watchLoginRequests } from './login.page';
+import { LOGIN_ERRORS, LoginPage, watchLoginRequests } from './login.page';
 
 /**
  * Login — client-side validation.
@@ -18,8 +18,8 @@ test.describe('login validation', () => {
 
     await login.submit.click();
 
-    await expect(login.passwordError(DE_ERRORS.emailInvalid)).toBeVisible();
-    await expect(login.passwordError(DE_ERRORS.passwordRequired)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.emailInvalid)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.passwordRequired)).toBeVisible();
     await expect(login.email).toHaveAttribute('aria-invalid', 'true');
     await expect(login.password).toHaveAttribute('aria-invalid', 'true');
     expect(wasLoginCalled()).toBe(false);
@@ -32,7 +32,7 @@ test.describe('login validation', () => {
 
     await login.submitWith('not-an-email', PRIMARY_PASSWORD);
 
-    await expect(login.passwordError(DE_ERRORS.emailInvalid)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.emailInvalid)).toBeVisible();
     expect(wasLoginCalled()).toBe(false);
   });
 
@@ -43,7 +43,7 @@ test.describe('login validation', () => {
 
     await login.submitWith(PRIMARY_EMAIL, 'short');
 
-    await expect(login.passwordError(DE_ERRORS.passwordMin)).toBeVisible();
+    await expect(login.passwordError(LOGIN_ERRORS.passwordMin)).toBeVisible();
     expect(wasLoginCalled()).toBe(false);
   });
 });

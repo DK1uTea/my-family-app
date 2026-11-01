@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { DateInputFloat } from '@/shared/components/ui/date-input-float';
 import { DatePicker } from '@/shared/components/ui/date-picker';
@@ -17,6 +17,9 @@ vi.mock('@/shared/stores/use-user-store', () => ({
 }));
 
 const VALUE = new Date('2026-08-01T10:30:00Z');
+
+beforeAll(() => vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh'));
+afterAll(() => vi.unstubAllEnvs());
 
 function expectOpenPopover() {
   const content = document.querySelector('[data-slot="popover-content"]');
@@ -52,7 +55,7 @@ describe('date picker overlays', () => {
     const user = userEvent.setup();
     render(<DateTimePicker value={VALUE} onChangeAction={vi.fn()} />);
 
-    await user.click(screen.getByRole('button', { name: /01\.08\.2026.*10:30/ }));
+    await user.click(screen.getByRole('button', { name: /01\.08\.2026.*17:30/ }));
 
     expectOpenPopover();
   });
@@ -112,7 +115,7 @@ describe('date picker overlays', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: /Date.*01\.08\.2026.*Time.*10:30/ }));
+    await user.click(screen.getByRole('button', { name: /Date.*01\.08\.2026.*Time.*17:30/ }));
 
     expect(document.querySelector('[data-slot="dialog-content"]')).toBeInTheDocument();
   });

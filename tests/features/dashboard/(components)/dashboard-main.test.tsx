@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DashboardMain from '@/features/dashboard/(components)/dashboard-main'
 import { PERMISSIONS } from '@/shared/constants/permissions'
 import { useUserStore } from '@/shared/stores/use-user-store'
-import deMessages from '@/messages/de.json'
+import viMessages from '@/messages/vi.json'
 
 /**
  * Test-case source: Dashboard test case sheet — "Role-based Visibility" section, plus
@@ -33,7 +33,7 @@ vi.mock('@/features/dashboard/(components)/dashboard-charts', () => ({
 
 function renderDashboard() {
   return render(
-    <NextIntlClientProvider locale="de" messages={deMessages}>
+    <NextIntlClientProvider locale="vi" messages={viMessages}>
       <DashboardMain />
     </NextIntlClientProvider>,
   )
@@ -63,17 +63,17 @@ describe('DashboardMain', () => {
     renderDashboard()
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Willkommen in Ihrem Dashboard!',
+      'Chào mừng bạn đến với bảng điều khiển!',
     )
   })
 
-  it("shows a name-based greeting as 'Guten Morgen, {firstName} {lastName}'", () => {
+  it("shows a name-based Vietnamese morning greeting with the user's name", () => {
     useUserStore.setState({ user: { firstName: 'Hai', lastName: 'Nguyen' } })
     vi.setSystemTime(new Date('2026-08-28T06:00:00.000Z')) // 06:00 UTC -> morning window
 
     renderDashboard()
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Guten Morgen, Hai Nguyen')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Chào buổi sáng, Hai Nguyen')
   })
 
   it('shows both Create Event and Go to Calendar, plus Your Upcoming Events, for an admin (wildcard permission)', () => {
@@ -81,8 +81,8 @@ describe('DashboardMain', () => {
 
     renderDashboard()
 
-    expect(screen.getByRole('link', { name: /Event erstellen/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Zum Kalender/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Tạo sự kiện/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Đến lịch/i })).toBeInTheDocument()
     expect(screen.getByText('DashboardEvents')).toBeInTheDocument()
   })
 
@@ -91,7 +91,7 @@ describe('DashboardMain', () => {
 
     renderDashboard()
 
-    expect(screen.getByRole('link', { name: /Event erstellen/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Tạo sự kiện/i })).toBeInTheDocument()
   })
 
   it('shows Go to Calendar when the role has only Event.List.Draft', () => {
@@ -99,7 +99,7 @@ describe('DashboardMain', () => {
 
     renderDashboard()
 
-    expect(screen.getByRole('link', { name: /Zum Kalender/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Đến lịch/i })).toBeInTheDocument()
   })
 
   it('shows Your Upcoming Events when the role has only Event.List.Active', () => {
@@ -115,8 +115,8 @@ describe('DashboardMain', () => {
 
     renderDashboard()
 
-    expect(screen.queryByRole('link', { name: /Event erstellen/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /Zum Kalender/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Tạo sự kiện/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Đến lịch/i })).not.toBeInTheDocument()
     expect(screen.queryByText('DashboardEvents')).not.toBeInTheDocument()
   })
 

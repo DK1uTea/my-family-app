@@ -119,6 +119,13 @@ pnpm e2e:new <module>     # scaffold a module folder (--public for no-auth pages
 pnpm test:all             # everything
 pnpm typecheck            # tsc --noEmit
 pnpm lint                 # eslint
+
+pnpm db:generate          # generate a Drizzle migration from schema changes
+pnpm db:migrate           # apply pending migrations to the configured database
+pnpm db:check             # check Drizzle migration history
+pnpm db:seed              # create the local super admin from .env.local credentials
+pnpm openapi:generate     # generate OpenAPI JSON from route contracts
+pnpm openapi:check        # verify route coverage and generated OpenAPI JSON
 ```
 
 **Test these:** zod schemas, `(helpers)/*-mapper.ts` (especially the null / `{}` defensive guards), `(helpers)/*-constants.ts` lookups, everything in `src/lib/`, and component behaviour (disabled states, conditional rendering, empty states).
@@ -164,14 +171,14 @@ For UI modules, describe behavior in `docs/specs/<module>.md` (template: `docs/s
 - **Locators live in a page object**, one per module, using `page.getByTestId('<name>')` against a `data-testid` — not role/text. When markup, copy, or structure changes, one file changes and the locator itself keeps working. Add a missing `data-testid` in `src/` as a dev change, not a QA edit, unless explicitly authorized otherwise. Full rationale: `.claude/skills/e2e-module-testing/SKILL.md`.
 - **Read server-driven values from the response, don't hardcode them** — an attempts-remaining count or lockout duration should come from `page.waitForResponse(...)`'s actual body, asserted against dynamically.
 - **`src/app/api/auth/*` always answers HTTP 200** and carries the real status inside the envelope; `unwrapEnvelope()` in `src/lib/api.ts` throws off that field.
-- **Locale comes from cookies, not the URL.** `src/proxy.ts` reads `preferredLanguage` then `NEXT_LOCALE`, defaults to `de`, and rewrites any path whose prefix disagrees — `/en/login` without a cookie lands on `/de/login`. Set it with `setLocaleCookie` in `e2e/shared/session.ts`.
+- **Locale comes from cookies, not the URL.** `src/proxy.ts` reads `preferredLanguage` then `NEXT_LOCALE`, defaults to `vi`, and rewrites any path whose prefix disagrees — `/en/login` without a cookie lands on `/vi/login`. Set it with `setLocaleCookie` in `e2e/shared/session.ts`.
 - **E2E is local-only and has no CI job — run `pnpm test:e2e` yourself before pushing.** Two reasons, either one sufficient: the captcha bypass in `src/lib/verify-captcha.ts` is double-gated on `NODE_ENV !== 'production'`, so it only works against `pnpm dev` (a CI job that built the app would have every sign-in rejected with `400 Captcha verification failed` — measured: it took the events suite from 40 passing to 4); and specs create, mutate and delete real Events through one shared real account, so two concurrent runs fight over it. `playwright.config.ts` therefore carries no CI branches, and **the `pnpm build && pnpm start` idea is closed — do not reintroduce it.**
 - **Local runs are capped at `workers: 2`.** Playwright's default is half your CPU cores; on a 16-core machine those 8 workers all paid `next dev`'s first-request route compile at once and starved data-dependent UI — a page's static shell rendered while its form body rendered nothing, so specs failed on controls that existed but never became enabled. Measured: 8 workers → 5 failed in 1.8min; 2 → 0 failed in 2.7min; 1 → 0 failed in 4.4min. `expect.timeout` is 10s to absorb the compile.
 
 **Testing a module behind auth** — a module spec starts the way a user does, so it covers the guard chain and the shell, not just the page. Harness: `e2e/shared/session.ts`; reference: `e2e/modules/user-settings/`.
 
 ```ts
-await signIn(page);                      // fills the real login form, waits for /de/dashboards
+await signIn(page);                      // fills the real login form, waits for /vi/dashboards
 await openModule(page, 'userSettings');  // clicks the sidebar entry, waits for the route
 await resumeSessionAt(page, 'events');   // real POST /api/auth/login via page.request, then straight to the page
 ```
@@ -195,7 +202,7 @@ await resumeSessionAt(page, 'events');   // real POST /api/auth/login via page.r
 - **Errors must be linked and announced** — `aria-describedby` → a `role="alert"` node, plus `aria-invalid` on the control. `Input` wires this automatically from its `error` prop; `InputGroup` needs `errorId` passed and set as `aria-describedby` on the control inside.
 - **Colour contrast is NOT enforced — do not fix it, test it, or report it.** Every colour and border comes from the per-tenant theme (`src/styles/themes/<tenant>.css`), configured by design to match an approved brand; the palette is a design decision, not a code one. `scanA11y` (`e2e/shared/a11y.ts`) disables axe's `color-contrast` rule for every scan repo-wide — never re-enable it, never add a per-spec exception, never assert a contrast ratio, and never change a colour/opacity/border token to raise contrast. This is the **only** blanket a11y exemption; `.disableRules()` may never be used for anything else.
 - **`<html lang>` must match the locale** — `src/app/layout.tsx` reads the `NEXT_LOCALE` cookie.
-- New `aria-label` strings are i18n keys — add to `en.json` **and** `de.json`.
+- New `aria-label` strings are i18n keys — add to `en.json` **and** `vi.json`.
 
 **Enforcement is a ratchet.** `eslint-plugin-jsx-a11y` recommended runs at `warn` (≈78 pre-existing violations across 39 files would otherwise block every commit); rules already at zero run at `error`; `src/features/auth/**` runs everything at `error`. **Never add a new violation of a warn-level rule** — warn means legacy debt, not optional. When a rule reaches zero repo-wide, promote it to `error` in `eslint.config.mjs`.
 
@@ -210,7 +217,7 @@ Runtime checks use `@axe-core/playwright` via `scanA11y` (`e2e/shared/a11y.ts`).
 | `playwright` | `.vscode/mcp.json` (VS Code / Copilot agent mode) + `.mcp.json` (Claude Code) | Drive a real browser to reproduce, inspect and verify UI changes |
 | `Neon` | `.mcp.json` + `.vscode/mcp.json` | Manage the linked Neon project and Postgres service through OAuth |
 
-Both run `npx -y @playwright/mcp@latest --isolated --browser chrome`. The dev server is **not** started for you in an MCP session — run `pnpm dev` first and drive `http://localhost:3000`. Every path needs its locale prefix (`/de/login`). Workflow in `.claude/skills/browser-verification-playwright/SKILL.md`.
+Both run `npx -y @playwright/mcp@latest --isolated --browser chrome`. The dev server is **not** started for you in an MCP session — run `pnpm dev` first and drive `http://localhost:3000`. Every path needs its locale prefix (`/vi/login`). Workflow in `.claude/skills/browser-verification-playwright/SKILL.md`.
 
 Adding a new MCP server means editing **both** `.vscode/mcp.json` and `.mcp.json`.
 
@@ -225,7 +232,7 @@ Adding a new MCP server means editing **both** `.vscode/mcp.json` and `.mcp.json
 | Styling       | Tailwind CSS v4 + shadcn (radix-nova style)                               |
 | Data fetching | TanStack Query v5 + Axios — hooks call the API directly |
 | Forms         | react-hook-form v7 + zod v4                                               |
-| i18n          | next-intl v4 (locales: `en`, `de`, default `de`, **URL prefix**)          |
+| i18n          | next-intl v4 (locales: `en`, `vi`, default `vi`, **URL prefix**)          |
 | URL state     | **nuqs** v2 (`useQueryStates`, `useQueryState`)                           |
 | Global state  | zustand v5                                                                |
 | Icons         | lucide-react + custom SVG icons in `src/shared/components/common/icons/`  |
@@ -286,9 +293,15 @@ directly. Compose with TypeScript factories, not NestJS. Drizzle schemas live in
 `src/server/drizzle/schema/` and migrations in
 `src/server/drizzle/migrations/`.
 
-Drizzle setup commands: `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:push`, `pnpm db:studio`. API docs are served at `/api/docs` with the
-
-source document at `/api/openapi.json`.
+Database workflow: `pnpm db:generate -- --name <short_snake_case_name>` creates new
+`YYYYMMDDHHmmss_<name>.sql` migrations with a UTC timestamp; review and commit schema,
+migration, snapshots, and journal together, then run `pnpm db:migrate`. Keep historical
+migration names unchanged. `pnpm db:check` validates migration history; CI checks generated
+migration drift. `pnpm db:seed` creates a local super admin from explicit `.env.local`
+credentials and must only target development. API workflow: update
+`src/server/openapi/contracts.ts`, run
+`pnpm openapi:generate` and `pnpm openapi:check`. Swagger is served at `/api/docs` and its
+generated source at `/api/openapi.json`. Full runbook: `src/server/README.md`.
 
 ### Directory Structure
 
@@ -317,7 +330,7 @@ src/
 │   ├── api-client.ts
 │   ├── get-error-message.ts          # BE error_code → translated string (errors namespace)
 │   └── utils.ts
-├── messages/en.json, de.json
+├── messages/en.json, vi.json
 ├── middleware.ts
 ├── proxy.ts
 └── shared/
@@ -430,30 +443,31 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
 
 ## Date & Time
 
-### DB Convention (Germany UTC+0 quirk)
+### Timestamp Convention
 
-All timestamps in the DB are stored as **UTC+0**, but the stored value **is** Germany local time — the server applies no offset. Example: "14:00 Germany time" is stored and returned as `14:00Z`, not `13:00Z`. The app targets Germany (UTC+1/+2). Per-user timezone is a planned future feature.
+Database and API timestamps represent UTC instants (the schema uses `timestamp with time zone`). ISO values ending in `Z` must be treated as instants; never reinterpret them as Germany wall-clock time. Display timestamps in the viewer's browser/device timezone. The same instant can appear as morning in Vietnam and evening or night in the Americas.
+
+Date-only values are calendar dates, not instants. Use `formatCalendarDate()` and keep date-only picker and range helpers on their UTC calendar representation so selecting a date does not move it across timezones.
 
 ### Rules
 
 1. **Never `import dayjs from 'dayjs'`** — always `import { dayjs } from '@/lib/date-utils'`
 2. **Never `new Date()`** for "now" — always `nowUtc()` from `@/lib/date-utils`
-3. **Always `dayjs.utc(x)`** for any date from DB or state — never bare `dayjs(x)`
+3. **Render timestamps in local time** with `formatDate()` or `dayjs(value)`; render date-only values with `formatCalendarDate()`. Use `dayjs.utc()` only for UTC serialization or date-only calendar calculations
 4. **Never hardcode format strings** — always get the format from `useDateFormat()` and pass it to `formatDate()`
-5. **Date pickers send values as-is** — user picks `14:00` → API receives `14:00Z`. Use `toApiDate(date)` to serialize for API calls.
+5. **Serialize picked timestamps as UTC instants** with `toApiDate(date)`; do not manually shift by the browser offset
 
 ```ts
 import { formatDate, nowUtc, toApiDate } from '@/lib/date-utils'
 import { useDateFormat } from '@/shared/stores/use-user-store'
 
 const dateFormat = useDateFormat()
-formatDate(dbDate, dateFormat)           // ✅ date only
-formatDate(dbDate, dateFormat, true)     // ✅ date + time
-dayjs.utc(dbDate).format('DD/MM/YYYY')  // ❌ hardcoded format — never
-nowUtc()                                 // ✅ current time
-new Date()                               // ❌ local timezone leaks in
-toApiDate(pickedDate)                    // ✅ serialize for API
-pickedDate.toISOString()                 // ❌ browser may shift the time
+formatDate(dbTimestamp, dateFormat)           // ✅ local date
+formatDate(dbTimestamp, dateFormat, true)     // ✅ local date and time
+dayjs.utc(dbTimestamp).format('DD/MM/YYYY')  // ❌ displays UTC instead of viewer-local time
+nowUtc()                                      // ✅ current instant
+new Date()                                    // ❌ use the shared helper
+toApiDate(pickedLocalDateTime)                // ✅ serialize as an ISO UTC instant
 ```
 
 ### Date Format Store
@@ -466,9 +480,6 @@ const dateFormat = useDateFormat()  // 'DD/MM/YYYY' | 'DD-MM-YYYY' | 'MM/DD/YYYY
 const setDateFormat = useUserStore((s) => s.setDateFormat)
 ```
 
-### Future Timezone Support
-
-When `user.timezone` is available, update display: `dayjs.utc(dbDate).tz(user.timezone).format(dateFormat)` and serialize: `toApiDate(date, user.timezone)`. Both utilities already accept `userTimezone` — no component changes needed.
 
 ---
 
@@ -596,23 +607,23 @@ const schema = z.object({
 
 Error messages are translated automatically via the `fieldErrors` namespace — never pass raw strings to `.message()`.
 
-If a type is missing, add it to `src/shared/schemas/` and export from `index.ts`, then add `fieldErrors.*` keys to both `en.json` and `de.json`.
+If a type is missing, add it to `src/shared/schemas/` and export from `index.ts`, then add `fieldErrors.*` keys to both `en.json` and `vi.json`.
 
 ---
 
 ## i18n
 
-Locale is in the **URL prefix**: `/de/dashboards`, `/en/settings`. Default: `de`.
+Locale is in the **URL prefix**: `/vi/dashboards`, `/en/settings`. Default: `vi`.
 
 ```tsx
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 
-<Link href="/dashboards">Dashboard</Link>  // renders /de/dashboards automatically
-router.push('/settings');                 // navigates to /de/settings
+<Link href="/dashboards">Dashboard</Link>  // renders /vi/dashboards automatically
+router.push('/settings');                 // navigates to /vi/settings
 const pathname = usePathname();           // /dashboards (no locale prefix)
 ```
 
-Always update **both** `en.json` and `de.json`. Namespace = feature name in camelCase.
+Always update **both** `en.json` and `vi.json`. Namespace = feature name in camelCase.
 
 Backend error codes live under the **`errors`** namespace and are resolved via `getErrorMessage(error_code)`, not `useTranslations()` — see Error Handling.
 
@@ -634,9 +645,9 @@ Backend error codes live under the **`errors`** namespace and are resolved via `
 
 The backend returns `{ status, message, error_code, data }`. `error_code` is a stable machine key (e.g. `WRONG_PASSWORD`, `INVITATION_EXPIRED`).
 
-- **`getErrorMessage(error_code)`** (`@/lib/get-error-message`) resolves the code to a translated string from the **`errors`** namespace of `en.json` / `de.json` (dots become underscores; falls back to `errors.default`)
+- **`getErrorMessage(error_code)`** (`@/lib/get-error-message`) resolves the code to a translated string from the **`errors`** namespace of `en.json` / `vi.json` (dots become underscores; falls back to `errors.default`)
 - The api client's response interceptor calls `getErrorMessage()` and shows it via `toast.error()` automatically on any 4xx/5xx — **feature code never needs to catch or toast API errors itself**
-- **New backend `error_code` → add a matching key under `errors` in both `en.json` and `de.json`**
+- **New backend `error_code` → add a matching key under `errors` in both `en.json` and `vi.json`**
 
 
 ---
@@ -700,8 +711,8 @@ import { TabsUrl } from '@/shared/components/ui/tabs-url';
 - ❌ Mock/fake data in component files (put in hooks)
 - ❌ Hardcoded strings in JSX (use `useTranslations`)
 - ❌ Local `escapeHTML` / `unescapeHTML` helpers in features — import them from `@/lib/html`
-- ❌ Adding only `en.json` without updating `de.json`
-- ❌ Manually prefixing `/de/` in router.push
+- ❌ Adding only `en.json` without updating `vi.json`
+- ❌ Manually prefixing `/vi/` in router.push
 - ❌ Hardcoding error copy in components — always resolve via `getErrorMessage(error_code)` / the `errors` i18n namespace
 - ❌ Catching/toasting API errors manually in hooks or services — the api client interceptor already does this
 - ❌ Raw `z.string().min()`, `z.string().email()`, etc. in schemas — use `s.string()`, `s.email()` from `@/shared/schemas`

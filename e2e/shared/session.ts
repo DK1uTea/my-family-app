@@ -17,13 +17,13 @@ import { LoginPage } from '../modules/login/login.page';
 
 /** Sidebar entries, read off the rendered page — canonical href and default labels. */
 export const MODULES = {
-  dashboards: { href: '/de/dashboards', label: 'Dashboards' },
-  calendarDashboard: { href: '/de/calendar-dashboard', label: 'Event-Katalog' },
-  events: { href: '/de/events', label: 'Event-Navigator' },
-  rent: { href: '/de/rent', label: 'Produktkatalog' },
-  customerActivation: { href: '/de/customer-activation', label: 'Kundenaktivierung' },
-  reportingTool: { href: '/de/reporting-tool', label: 'Event-Berichtstool' },
-  userSettings: { href: '/de/user-settings', label: 'Benutzereinstellungen' },
+  dashboards: { href: '/vi/dashboards', label: 'Dashboards' },
+  calendarDashboard: { href: '/vi/calendar-dashboard', label: 'Calendar Navigator' },
+  events: { href: '/vi/events', label: 'Event Navigator' },
+  rent: { href: '/vi/rent', label: 'Catalogue' },
+  customerActivation: { href: '/vi/customer-activation', label: 'Customer Activation' },
+  reportingTool: { href: '/vi/reporting-tool', label: 'Event Reporting Tool' },
+  userSettings: { href: '/vi/user-settings', label: 'User Settings' },
 } as const;
 
 export type ModuleName = keyof typeof MODULES;
@@ -31,7 +31,7 @@ export type ModuleName = keyof typeof MODULES;
 /**
  * Required — every test in this suite that signs in uses this account.
  *
- * The account's stored `preferredLanguage` may be German or English. Tests that assert
+ * The account's stored `preferredLanguage` may be Vietnamese or English. Tests that assert
  * module UI copy must derive the locale from the authenticated page rather than assuming
  * a language or trying to override the account preference with a cookie.
  */
@@ -93,14 +93,14 @@ export function restrictedCredentials() {
  * UI journey, for specs that are testing the journey itself.
  *
  * The account's real, stored language preference is the source of truth. The redirect may
- * land on either `/de/dashboards` or `/en/dashboards`, so callers must match both or derive
+ * land on either `/vi/dashboards` or `/en/dashboards`, so callers must match both or derive
  * copy and routes from the resulting page URL.
  */
 export async function signIn(page: Page, credentials = primaryCredentials()) {
   const login = new LoginPage(page);
   await login.goto();
   await login.submitWith(credentials.email, credentials.password);
-  await page.waitForURL(/\/(?:de|en)\/dashboards/, { timeout: 30_000 });
+  await page.waitForURL(/\/(?:vi|en)\/dashboards/, { timeout: 30_000 });
 }
 
 /**
@@ -146,15 +146,15 @@ export async function logoutSession(page: Page) {
   await page.context().clearCookies();
 
   // A full navigation drops the previous React Query/Zustand in-memory auth state too.
-  await page.goto("/de/login");
+  await page.goto("/vi/login");
 }
 
 /**
  * Pins the UI language.
  *
  * The locale is driven by cookies, not by the URL: `src/proxy.ts` reads
- * `preferredLanguage` then `NEXT_LOCALE`, falls back to `de`, and rewrites any path whose
- * prefix disagrees. Visiting `/en/login` without this cookie lands on `/de/login`.
+ * `preferredLanguage` then `NEXT_LOCALE`, falls back to `vi`, and rewrites any path whose
+ * prefix disagrees. Visiting `/en/login` without this cookie lands on `/vi/login`.
  *
  * Also sets `appearance` — not because this helper is about theme, but because
  * `src/proxy.ts` only trusts an already-set locale when `appearance` is present too:
@@ -163,7 +163,7 @@ export async function logoutSession(page: Page) {
  * request and overwrites the locale with the account's real stored preference, silently
  * undoing this pin.
  */
-export async function setLocaleCookie(page: Page, locale: 'de' | 'en') {
+export async function setLocaleCookie(page: Page, locale: 'vi' | 'en') {
   const url = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
   await page.context().addCookies([
     { name: 'preferredLanguage', value: locale, url },

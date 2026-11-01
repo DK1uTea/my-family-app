@@ -18,10 +18,10 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.148 0.004 285.8);
 
-  /* --- Brand primary (red) --- */
-  --primary: oklch(0.608 0.249 28.7);              /* #F40009 */
+  /* --- Brand primary --- */
+  --primary: oklch(0.627 0.170 149.2);              /* #16A34A */
   --primary-foreground: oklch(1 0 0);
-  --primary-hover: oklch(0.637 0.214 25.2);        /* #F74F47 */
+  --primary-hover: oklch(0.655 0.170 149.2);
 
   /* --- Secondary / Muted (neutral grays) --- */
   --secondary: oklch(0.914 0.004 262.3);           /* #E5E6E8 */
@@ -43,17 +43,17 @@
 
   /* --- Brand-specific surfaces --- */
   --background-header: oklch(1 0 0);               /* #ffffff */
-  --background-login: oklch(0.537 0.277 27.3);     /* #F40009 */
+  --background-login: oklch(0.627 0.170 149.2);     /* #16A34A */
 
-  /* --- Sidebar (brand maroon — same in light & dark) --- */
-  --sidebar: oklch(0.342 0.168 350.1);             /* #76154B */
+  /* --- Sidebar (brand green — same in light & dark) --- */
+  --sidebar: oklch(0.342 0.120 149.2);
   --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.291 0.129 349.5);     /* #5F1D42 — active item */
+  --sidebar-primary: oklch(0.291 0.100 149.2);     /* active item */
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.318 0.150 349.8);      /* hover state */
+  --sidebar-accent: oklch(0.375 0.120 149.2);      /* hover state */
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 15%);
-  --sidebar-ring: oklch(0.637 0.214 25.2);
+  --sidebar-ring: oklch(0.627 0.170 149.2);
 
   /* --- Footer --- */
   --footer: oklch(0.878 0 0);                        /* #DCDCDC */
@@ -98,10 +98,10 @@
   --popover: oklch(0.200 0.006 264.1);
   --popover-foreground: oklch(1 0 0);
 
-  /* --- Brand primary (red — unchanged across modes) --- */
-  --primary: oklch(0.608 0.249 28.7);
+  /* --- Brand primary --- */
+  --primary: oklch(0.723 0.192 149.6);              /* #22C55E */
   --primary-foreground: oklch(1 0 0);
-  --primary-hover: oklch(0.637 0.214 25.2);
+  --primary-hover: oklch(0.755 0.180 149.6);
 
   /* --- Secondary / Muted (dark grays) --- */
   --secondary: oklch(0.268 0.007 264.3);           /* #303134 */
@@ -123,17 +123,17 @@
 
   /* --- Brand-specific surfaces --- */
   --background-header: oklch(0.200 0.006 264.1);   /* #202124 */
-  --background-login: oklch(0.145 0.065 27.3);     /* #240000 */
+  --background-login: oklch(0.145 0.065 149.6);     /* #002409 */
 
-  /* --- Sidebar (brand maroon — unchanged in dark) --- */
-  --sidebar: oklch(0.342 0.168 350.1);
+  /* --- Sidebar (brand green — unchanged in dark) --- */
+  --sidebar: oklch(0.342 0.120 149.2);
   --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.291 0.129 349.5);
+  --sidebar-primary: oklch(0.291 0.100 149.2);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.318 0.150 349.8);
+  --sidebar-accent: oklch(0.375 0.120 149.2);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.637 0.214 25.2);
+  --sidebar-ring: oklch(0.723 0.192 149.6);
 
   /* --- Footer --- */
   --footer: oklch(0.145 0.065 27.3);                /* #240000 */

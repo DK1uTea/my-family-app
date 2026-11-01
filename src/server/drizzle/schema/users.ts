@@ -34,7 +34,7 @@ export const userPreferences = pgTable("user_preferences", {
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
   preferredLanguage: varchar("preferred_language", { length: 10 })
-    .default("de")
+    .default("vi")
     .notNull(),
   appearance: varchar("appearance", { length: 10 }).default("light").notNull(),
   currency: varchar("currency", { length: 10 }).default("EUR").notNull(),

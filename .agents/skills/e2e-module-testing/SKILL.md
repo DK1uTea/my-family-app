@@ -92,7 +92,7 @@ There is no `real.spec.ts` aspect — every aspect already is real.
 - **`<module>.page.ts`** — the page object. All locators live here so a markup or copy
   change touches one file. Document any locator that looks odd, with the reason.
 - **`<module>.data.ts`** — credentials (read from env via the helpers in
-  `e2e/shared/session.ts`) and the exact strings the user sees. German, since `de` is the
+  `e2e/shared/session.ts`) and the exact strings the user sees. Vietnamese, since `vi` is the
   default locale.
 
 ## Commands
@@ -181,7 +181,7 @@ Full recipe in `.Codex/skills/browser-verification-playwright/SKILL.md`. The sho
    `browser_network_request`.
 4. `browser_console_messages` — zero errors, zero warnings.
 
-Never write an assertion for a string you found in `de.json` but did not see rendered. The
+Never write an assertion for a string you found in `vi.json` but did not see rendered. The
 login module has a live example of why: the empty-email message comes from
 `fieldErrors.email`, while `login.validation.emailRequired` also exists in both locale files
 and is dead code.
@@ -194,7 +194,7 @@ pnpm e2e:new impressum --public           # no sign-in needed
 ```
 
 The generated specs fail on purpose — they are the RED step. For an authenticated module,
-add the module to `MODULES` in `e2e/shared/session.ts` first, with its href and the German
+add the module to `MODULES` in `e2e/shared/session.ts` first, with its href and the Vietnamese
 sidebar label.
 
 ## Step 4 — Write the specs
@@ -315,7 +315,7 @@ provisioned yet. Silence reads as coverage.
   response.
 - **Read server-driven values from the response**, don't hardcode them — see "Reading the
   real response instead of hardcoding it" above.
-- **Assert German copy.** `de` is the default locale and what users see.
+- **Assert Vietnamese copy.** `vi` is the default locale and what users see.
 - **Never `waitForTimeout`.** `expect(...).toBeVisible()` auto-waits.
 - **Never assert Tailwind classes.** Roles, text, `data-*`.
 - **One flow per file.** If a spec file needs two `describe` blocks about different things,

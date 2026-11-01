@@ -58,7 +58,7 @@ ASSUMPTIONS:
 2. It is permission-gated and needs a ModuleKey in permissions.ts
 3. Data comes from the `cam` backend module via the catch-all proxy
 4. List state (page, search, status filter) is URL state via nuqs, not zustand
-5. German is the primary locale — copy will be written de-first, en second
+5. Vietnamese is the primary locale — copy will be written vi-first, en second
 → Correct me now or I proceed with these.
 ```
 
@@ -113,7 +113,7 @@ Each user-visible behaviour as a bullet. These become test names verbatim.
 ## Architecture
 - Feature folder layout: (helpers) / (hooks) / (components)
 - New shared components (and their showcase section)
-- New i18n namespace + keys, in both en.json and de.json
+- New i18n namespace + keys, in both en.json and vi.json
 - New permission keys, if gated
 
 ## Testing Strategy
@@ -122,7 +122,7 @@ Each user-visible behaviour as a bullet. These become test names verbatim.
 - E2E: which single critical path, if any
 
 ## Boundaries
-- Always: TDD per behaviour, update en.json + de.json together, run pnpm test before done
+- Always: TDD per behaviour, update en.json + vi.json together, run pnpm test before done
 - Ask first: new dependency, new backend module prefix, schema-shaped API change
 - Never: commit secrets, skip a failing test, hardcode strings or colors in JSX
 

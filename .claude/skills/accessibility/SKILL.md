@@ -86,7 +86,7 @@ An icon is invisible to a screen reader. If the state changes, the name changes 
 </button>
 ```
 
-Both label strings are i18n keys and go into **`en.json` and `de.json` together**.
+Both label strings are i18n keys and go into **`en.json` and `vi.json` together**.
 
 **Never `tabIndex={-1}` on something a user must be able to operate.** It is only for
 elements focused programmatically.
@@ -160,7 +160,7 @@ enforced, and `.disableRules()` may never be used to turn any of those green.
 ### Page language
 
 `<html lang>` must match the rendered locale (WCAG 3.1.1) — without it a screen reader
-reads German text with English pronunciation. `src/app/layout.tsx` derives it from the
+reads Vietnamese text with English pronunciation. `src/app/layout.tsx` derives it from the
 `NEXT_LOCALE` cookie that `src/proxy.ts` maintains.
 
 ## What Enforces This
@@ -224,4 +224,4 @@ failure plainly and let a human decide.
 - [ ] Errors carry `aria-describedby` + `role="alert"`, control has `aria-invalid`
 - [ ] `pnpm lint` reports no new a11y warnings and zero a11y errors
 - [ ] The axe scan passes clean **and** with errors displayed
-- [ ] New `aria-label` strings exist in both `en.json` and `de.json`
+- [ ] New `aria-label` strings exist in both `en.json` and `vi.json`

@@ -17,10 +17,10 @@ runtime.
 The app provides:
 
 - **Tenant theming** — Each tenant ships its own CSS token set (brand colors, typography, radius) without touching component logic.
-- **Locale-first routing** — Every URL carries an explicit locale prefix (`/de/…`, `/en/…`). Locale is the single source of truth for language.
+- **Locale-first routing** — Every URL carries an explicit locale prefix (`/vi/…`, `/en/…`). Vietnamese is the default locale.
 - **URL-as-state** — All filter, pagination, and search state lives in the URL via `nuqs`, making every view deep-linkable and shareable.
 - **Direct data layer** — Feature hooks call same-origin API routes via TanStack Query + Axios; Route Handlers either proxy the existing external API or call a first-party server module.
-- **Consistent error contract** — Backend errors resolve to translated messages through the `errors` namespace in `messages/en.json` / `de.json`.
+- **Consistent error contract** — Backend errors resolve to translated messages through the `errors` namespace in `messages/en.json` / `vi.json`.
 - **Design system agnostic pages** — Features only consume semantic tokens and shared primitives, allowing instant theme swapping.
 
 ## Core Principles

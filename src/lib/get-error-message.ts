@@ -1,14 +1,14 @@
 import en from '@/messages/en.json';
-import de from '@/messages/de.json';
+import vi from '@/messages/vi.json';
 
 type ErrorMessages = typeof en.errors;
 
-const ERROR_MESSAGES: Record<string, ErrorMessages> = { en: en.errors, de: de.errors };
+const ERROR_MESSAGES: Record<string, ErrorMessages> = { en: en.errors, vi: vi.errors };
 
 function getCurrentLocale(): string {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return 'vi';
   const segment = window.location.pathname.split('/')[1];
-  return segment === 'de' ? 'de' : 'en';
+  return segment === 'en' ? 'en' : 'vi';
 }
 
 export function getErrorMessage(errorCode: string | undefined): string {

@@ -71,7 +71,7 @@ export function DateInputFloat({
         allowPastDates={allowPastDates} minDate={minDate} overlay={overlay}
         trigger={(
           <button type="button" disabled={disabled} data-testid={testId}
-            aria-label={`${dateLabel}: ${value ? formatDate(value, dateFormat) : datePlaceholder ?? ''}; ${timeLabel}: ${value ? dayjs.utc(value).format('HH:mm') : timePlaceholder ?? ''}`}
+            aria-label={`${dateLabel}: ${value ? formatDate(value, dateFormat) : datePlaceholder ?? ''}; ${timeLabel}: ${value ? dayjs(value).format('HH:mm') : timePlaceholder ?? ''}`}
             aria-describedby={describedBy}
             className="group flex w-full gap-3 text-left disabled:cursor-not-allowed disabled:opacity-50">
             <DateFloatField label={dateLabel}
@@ -80,7 +80,7 @@ export function DateInputFloat({
               icon={<Calendar1 className="size-4.5 shrink-0" />}
               error={Boolean(error)} className="flex-1" />
             <DateFloatField label={timeLabel}
-              displayValue={value ? dayjs.utc(value).format('HH:mm') : ''}
+              displayValue={value ? dayjs(value).format('HH:mm') : ''}
               placeholder={timePlaceholder}
               icon={<ClockIcon className="size-4.5 shrink-0" />}
               error={Boolean(error)} className="w-50 max-w-1/2" />

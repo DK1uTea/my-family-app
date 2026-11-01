@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Calendar } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { dayjs, nowUtc, formatDate } from '@/lib/date-utils'
+import { dayjs, nowUtc, formatCalendarDate } from '@/lib/date-utils'
 import { useDateFormat } from '@/shared/stores/use-user-store'
 import { cn } from '@/lib/utils'
 import { MiniCalendar } from '@/shared/components/ui/mini-calendar'
@@ -58,7 +58,7 @@ export function DatePicker({ value, onChangeAction, defaultValue, disablePast, c
         >
           <Calendar className="size-4 text-primary shrink-0" />
           {value
-            ? formatDate(value, dateFormat)
+            ? formatCalendarDate(value, dateFormat)
             : <span className="text-muted-foreground">{t('startDate')}</span>}
         </button>}
       >

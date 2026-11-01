@@ -44,7 +44,7 @@ function getAppearanceCookie(req: NextRequest): Appearance | undefined {
 }
 
 function getPathLocale(pathname: string): AppLocale | undefined {
-  const locale = pathname.match(/^\/(en|de)(?:\/|$)/)?.[1];
+  const locale = pathname.match(/^\/(en|vi)(?:\/|$)/)?.[1];
   return isSupportedLocale(locale) ? locale : undefined;
 }
 
@@ -113,9 +113,9 @@ async function fetchUserPreferences(req: NextRequest, accessToken?: string): Pro
   }
 }
 
-/** Strip the locale prefix to get the canonical path (e.g. /de/dashboards → /dashboards) */
+/** Strip the locale prefix to get the canonical path (e.g. /vi/dashboards → /dashboards) */
 function stripLocale(pathname: string): string {
-  return pathname.replace(/^\/(en|de)/, '') || '/';
+  return pathname.replace(/^\/(en|vi)/, '') || '/';
 }
 
 function isAuthRoute(path: string): boolean {

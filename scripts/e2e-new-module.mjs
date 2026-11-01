@@ -40,7 +40,7 @@ if (existsSync(dir)) {
 const moduleKey = name.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCase());
 
 const dataFile = `/**
- * ${name} — visible copy, read off the rendered page (German, the default locale).
+ * ${name} — visible copy, read off the rendered page (Vietnamese, the default locale).
  * Keeping it here means a copy change touches one file, not every spec.
  *
  * TODO: replace these with strings you actually saw in the browser.
@@ -72,7 +72,7 @@ test.describe('${name} journey', () => {
   }) => {
     await signIn(page);
 
-    await expect(page).toHaveURL(/\\/de\\/dashboards/);
+    await expect(page).toHaveURL(/\\/vi\\/dashboards/);
     await expect(sidebarLink(page, '${moduleKey}')).toBeVisible();
 
     await openModule(page, '${moduleKey}');
@@ -84,7 +84,7 @@ test.describe('${name} journey', () => {
   test('sends an unauthenticated visitor to login instead', async ({ page }) => {
     await page.goto(MODULES.${moduleKey}.href);
 
-    await expect(page).toHaveURL(/\\/de\\/login/);
+    await expect(page).toHaveURL(/\\/vi\\/login/);
   });
 });
 `;
@@ -101,7 +101,7 @@ import { COPY } from './${name}.data';
  * .claude/skills/e2e-module-testing/SKILL.md.
  */
 
-const ROUTE = '/de/${name}';
+const ROUTE = '/vi/${name}';
 
 test.describe('${name} flow', () => {
   test('renders its heading', async ({ page }) => {
@@ -166,7 +166,7 @@ test.describe('${name} accessibility', () => {
   test('has no automatically detectable WCAG 2.1 AA violations', async ({ page }) => {
 ${
   isPublic
-    ? `    await page.goto('/de/${name}');`
+    ? `    await page.goto('/vi/${name}');`
     : `    await resumeSessionAt(page, '${moduleKey}');`
 }
     await expect(page.getByRole('heading', { name: COPY.heading })).toBeVisible();
@@ -197,7 +197,7 @@ console.log('');
 
 if (!isPublic) {
   console.log(`Next: add "${moduleKey}" to MODULES in e2e/shared/session.ts, with its`);
-  console.log('      href and the German sidebar label users click.');
+  console.log('      href and the Vietnamese sidebar label users click.');
 }
 
 console.log('Then: open the page with the Playwright MCP browser, read the accessibility');

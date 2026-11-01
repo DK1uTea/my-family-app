@@ -9,23 +9,23 @@ type AuthFooterCopyrightProps = {
 
 export function AuthFooterCopyright({ className }: AuthFooterCopyrightProps) {
   const tf = useTranslations('footer')
-  const year = dayjs.utc().year()
+  const year = dayjs().year()
 
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-121.25 flex-col items-center justify-center gap-3 text-base font-medium text-foreground md:flex-row md:gap-12 font-brand-wide',
+        'mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-x-8 gap-y-3 text-center text-base font-medium text-foreground font-brand-wide md:flex-row',
         className
       )}
     >
-      <span className="order-1 whitespace-nowrap text-center md:order-0 md:text-left">
+      <span className="order-1 md:order-0">
         {tf('copyright', { year })}
       </span>
-      <div className="flex items-center justify-center gap-3 md:justify-start md:gap-5.5">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
         <Link href="/impressum" className="underline underline-offset-2 hover:opacity-80">
           {tf('impressum')}
         </Link>
-        <Link href="/datenschutz" className="whitespace-nowrap underline underline-offset-2 hover:opacity-80">
+        <Link href="/datenschutz" className="underline underline-offset-2 hover:opacity-80">
           {tf('privacyPolicy')}
         </Link>
         <Link href="/agb" className="underline underline-offset-2 hover:opacity-80">

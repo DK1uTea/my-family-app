@@ -65,6 +65,6 @@ export function UserDetailMain() {
 - ✅ `defaultValue` = first tab in the list
 - ✅ `syncUrl={false}` for drawers, dialogs, embedded panels
 - ✅ `variant="line"` for page navigation tabs
-- ✅ Translate labels via `useTranslations`; add to both `en.json` and `de.json`
+- ✅ Translate labels via `useTranslations`; add to both `en.json` and `vi.json`
 - ❌ Never `useState` for active tab — use `TabsUrl`
 - ❌ Never add `value` or `onValueChange` to `TabsUrl`

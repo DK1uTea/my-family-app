@@ -70,8 +70,8 @@ export function broadcastAuth(message: AuthMessage) {
 
 function redirectToLogin() {
   if (typeof window === "undefined") return;
-  // Read locale from URL path since we use [locale] routing (/de/dashboards)
-  const locale = window.location.pathname.split("/")[1] || "de";
+  // Read locale from URL path since we use [locale] routing (/vi/dashboards)
+  const locale = window.location.pathname.split("/")[1] || "vi";
   window.location.assign(`/${locale}/login`);
 }
 
@@ -110,7 +110,7 @@ function applyRequestInterceptor(instance: AxiosInstance) {
   instance.interceptors.request.use((config) => {
     if (typeof window === "undefined") return config;
 
-    const locale = window.location.pathname.split("/")[1] || "de";
+    const locale = window.location.pathname.split("/")[1] || "vi";
     const visitorId = localStorage.getItem("fingerprint") || "";
     config.headers.set("x-lang", locale);
     config.headers.set("x-user-identifier", visitorId);

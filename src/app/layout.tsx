@@ -32,13 +32,13 @@ const themeInitScript = `
 `;
 
 export const metadata: Metadata = {
-  title: 'Ft My Family App',
-  description: 'Ft My Family App application built with Next.js 16 and Tailwind CSS v4.',
+  title: 'My Family App',
+  description: 'My Family App application built with Next.js 16 and Tailwind CSS v4.',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // WCAG 3.1.1 (Language of Page) — without `lang` a screen reader reads German content
-  // with English pronunciation rules. This layout sits above the [locale] segment, so the
+  // WCAG 3.1.1 (Language of Page) — without `lang` a screen reader uses the wrong pronunciation
+  // with the wrong pronunciation rules. This layout sits above the [locale] segment, so the
   // locale comes from the cookie `src/proxy.ts` maintains.
   const cookieLocale = (await cookies()).get('NEXT_LOCALE')?.value;
   const lang = routing.locales.includes(cookieLocale as never)

@@ -64,6 +64,10 @@ Handlers while preserving the current browser login, refresh, and logout experie
   tokens in JSON or log raw credentials/tokens.
 - Local development should use the Neon `development` branch. Do not test auth writes
   against `production`.
+- A local super admin can be created with `pnpm db:seed` using explicit credentials in
+  `.env.local`; it has `role_key=admin`, wildcard `*` permissions, and Vietnamese defaults.
+  The command does not overwrite an existing email, requires `NEON_BRANCH=development`,
+  and refuses `NODE_ENV=production`.
 
 ## Out of scope
 
@@ -79,5 +83,4 @@ behavior. Dev implements against this spec and does not edit test files.
 
 ## Open questions
 
-- Does phase one need a local admin seed/create-user command before invite registration?
 - Are the four auth endpoints sufficient for the first migration slice?

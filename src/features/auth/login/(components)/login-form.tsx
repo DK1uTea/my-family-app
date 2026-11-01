@@ -33,7 +33,7 @@ export function LoginForm() {
       <div className="flex flex-col gap-8">
         <div className="flex justify-center">
           <Image
-            src="/images/logo_red.png"
+            src="/images/logo_green.png"
             alt="Logo"
             width={800}
             height={143}
@@ -48,7 +48,7 @@ export function LoginForm() {
               {t('email')}
               {/* Decoration only. `required` on the input is what tells assistive tech the
                   field is mandatory; an unhidden asterisk just gets announced as "star". */}
-              <span aria-hidden="true" className="text-primary">*</span>
+              <span aria-hidden="true" className="text-destructive">*</span>
             </Label>
             <Controller
               name="email"
@@ -73,7 +73,7 @@ export function LoginForm() {
           <div className="flex flex-col gap-1.25">
             <Label htmlFor={PASSWORD_FIELD_ID} className="text-sm font-medium text-foreground">
               {t('password')}
-              <span aria-hidden="true" className="text-primary">*</span>
+              <span aria-hidden="true" className="text-destructive">*</span>
             </Label>
             <div>
               <Controller

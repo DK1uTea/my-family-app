@@ -91,7 +91,7 @@ export function useUserActions() {
 
 ## Error Handling
 
-Backend responses are `{ status, message, error_code, data }`. The api client's response interceptor already resolves `error_code` via `getErrorMessage()` (`@/lib/get-error-message`, reading the **`errors`** namespace of `en.json`/`de.json`) and fires `toast.error()` automatically — **no try/catch or manual toasts in hooks/services**. New backend `error_code` → add a key under `errors` in both `en.json` and `de.json`.
+Backend responses are `{ status, message, error_code, data }`. The api client's response interceptor already resolves `error_code` via `getErrorMessage()` (`@/lib/get-error-message`, reading the **`errors`** namespace of `en.json`/`vi.json`) and fires `toast.error()` automatically — **no try/catch or manual toasts in hooks/services**. New backend `error_code` → add a key under `errors` in both `en.json` and `vi.json`.
 
 ## Key Rules
 
