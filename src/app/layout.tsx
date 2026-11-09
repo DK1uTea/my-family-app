@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { Geist_Mono } from 'next/font/google';
+import { Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { routing } from '@/i18n/routing';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
@@ -10,6 +10,11 @@ import { ThemeProvider } from '@/shared/providers/theme-provider';
 import { FingerprintInit } from '@/shared/components/common/fingerprint-init';
 
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta-sans',
+  subsets: ['latin', 'latin-ext', 'vietnamese'],
+  display: 'swap',
+});
 
 const themeInitScript = `
 (() => {
@@ -46,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     : routing.defaultLocale;
 
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang} className={plusJakartaSans.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

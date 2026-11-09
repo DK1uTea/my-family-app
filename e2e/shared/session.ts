@@ -15,15 +15,11 @@ import { LoginPage } from '../modules/login/login.page';
  * chain (`src/proxy.ts`), the locale rewrite and the shell — not just the module page.
  */
 
-/** Sidebar entries, read off the rendered page — canonical href and default labels. */
+/** Current private modules and their stable sidebar test IDs. */
 export const MODULES = {
-  dashboards: { href: '/vi/dashboards', label: 'Dashboards' },
-  calendarDashboard: { href: '/vi/calendar-dashboard', label: 'Calendar Navigator' },
-  events: { href: '/vi/events', label: 'Event Navigator' },
-  rent: { href: '/vi/rent', label: 'Catalogue' },
-  customerActivation: { href: '/vi/customer-activation', label: 'Customer Activation' },
-  reportingTool: { href: '/vi/reporting-tool', label: 'Event Reporting Tool' },
-  userSettings: { href: '/vi/user-settings', label: 'User Settings' },
+  dashboards: { href: '/vi/dashboards', testId: 'sidebar-dashboards' },
+  eventTimeline: { href: '/vi/event-timeline', testId: 'sidebar-event-timeline' },
+  settings: { href: '/vi/settings', testId: 'sidebar-settings' },
 } as const;
 
 export type ModuleName = keyof typeof MODULES;
@@ -61,19 +57,6 @@ export function lockedCredentials() {
 export function inactiveCredentials() {
   const email = process.env.E2E_INACTIVE_USER_EMAIL;
   const password = process.env.E2E_INACTIVE_USER_PASSWORD;
-  return email && password ? { email, password } : null;
-}
-
-/**
- * A wildcard-admin ("White Card") account — needed to test Export Excel /
- * Transfer Event visibility on calendar-dashboard, both gated on the `*`
- * permission per `src/features/calendar/CONTEXT.md`. Follows the same
- * optional/null pattern as `lockedCredentials`/`restrictedCredentials`: no
- * env vars configured means the calling spec should `test.skip(...)`.
- */
-export function wildcardAdminCredentials() {
-  const email = process.env.E2E_WILDCARD_ADMIN_EMAIL;
-  const password = process.env.E2E_WILDCARD_ADMIN_PASSWORD;
   return email && password ? { email, password } : null;
 }
 
@@ -159,7 +142,7 @@ export async function logoutSession(page: Page) {
  * Also sets `appearance` — not because this helper is about theme, but because
  * `src/proxy.ts` only trusts an already-set locale when `appearance` is present too:
  * `needsServerPreferences = isAuthenticated && (!preferredLanguage || !appearance)`. Miss
- * `appearance` and the middleware refetches `/user/me` on the very next authenticated
+ * `appearance` and the middleware refetches user preferences on the next authenticated
  * request and overwrites the locale with the account's real stored preference, silently
  * undoing this pin.
  */
@@ -187,18 +170,9 @@ export async function waitForImagesSettled(page: Page) {
   );
 }
 
-/**
- * A module's entry in the sidebar.
- *
- * Scoped to the sidebar on purpose: the breadcrumb renders the current page as
- * `<span role="link">DASHBOARDS</span>`, so an unscoped `getByRole('link', …)` is a
- * strict-mode violation on whichever module the user is currently looking at.
- */
+/** A module's stable sidebar entry, independent of copy or locale. */
 export function sidebarLink(page: Page, name: ModuleName) {
-  return page
-    .locator('[data-slot="sidebar-menu-button"]')
-    .filter({ hasText: MODULES[name].label })
-    .first();
+  return page.getByTestId(MODULES[name].testId);
 }
 
 /** Clicks a module in the sidebar the way a user would, then waits for its route. */

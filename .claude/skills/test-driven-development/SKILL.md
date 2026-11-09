@@ -37,6 +37,9 @@ server module at `src/server/modules/<domain>/SPEC.md`.
 
 ## The New Flow
 
+The diagram below shows the ownership handoff, not a requirement that QA finish before dev
+starts. QA and dev may work in parallel from the same approved spec.
+
 ```
  ┌────────────┐   ┌────────────────────┐   ┌───────────────────┐   ┌─────────────┐
  │   SPEC     │──▶│  QA writes/updates │──▶│  Dev implements    │──▶│  Dev runs   │
@@ -130,7 +133,17 @@ behavior contract changes. If implementation is wrong, report it to dev.
 ```
 
 A test that passes on its very first run proves nothing — it has not yet shown it can fail.
-That confirmation is QA's job before dev starts GREEN, not dev's job to skip.
+For new or changed behavior, QA confirms RED against the pre-change baseline before the
+implementation is merged. When QA and dev work concurrently, use separate branches or
+worktrees: QA records the baseline command and failure, then merges the test for the green
+run. A test written after implementation exists must be checked against the pre-change
+baseline or an isolated equivalent; do not claim RED based only on a passing run against
+finished code.
+
+A pure refactor with unchanged behavior does not need an artificial failing test: QA checks
+the existing behavior cases against both baseline and refactor. If a test is added for
+behavior already present, record that it passes on baseline instead of claiming it proved
+RED.
 
 ## This Repository's Commands
 
@@ -418,6 +431,6 @@ pending.
 ### QA / test role
 - [ ] No implementation source under `src/` was created, edited, or deleted by QA
 - [ ] Every "Behaviour" bullet in the spec has a matching test name
-- [ ] Each new/updated test was confirmed to fail for the right reason before implementation existed or was expected to satisfy it
+- [ ] New/changed behavior tests have recorded RED evidence against the pre-change baseline; unchanged refactors and already-existing behavior are identified accurately
 - [ ] Test names describe the behaviour, not the function name
 - [ ] Bug reports include a reproduction test; requirement changes update the test encoding the old behaviour

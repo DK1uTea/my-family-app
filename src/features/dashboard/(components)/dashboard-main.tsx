@@ -1,13 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { nowUtc } from "@/lib/date-utils";
-import { ComponentGuard } from "@/shared/components/common/component-guard";
-import { PERMISSIONS } from "@/shared/constants/permissions";
 import { useUserStore } from "@/shared/stores/use-user-store";
-import DashboardCharts from "./dashboard-charts";
-import DashboardEvents from "./dashboard-events";
 
 function getGreeting(
   t: (key: "morning" | "afternoon" | "evening" | "night") => string,
@@ -31,36 +26,9 @@ export default function DashboardMain() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">{greeting}</h1>
+        <h1 data-testid="dashboard-heading" className="text-3xl font-bold tracking-tight">{greeting}</h1>
       </div>
 
-      <div className="flex gap-4">
-        <ComponentGuard
-          requiredKeys={[
-            PERMISSIONS.Event.Create,
-            PERMISSIONS.Event.Management,
-          ]}
-        >
-          <Link href="/events/create">{t("createEvent")}</Link>
-        </ComponentGuard>
-
-        <ComponentGuard
-          requiredKeys={[
-            PERMISSIONS.Event.List.Draft,
-            PERMISSIONS.Calendar.List,
-          ]}
-        >
-          <Link href="/calendar">{t("goToCalendar")}</Link>
-        </ComponentGuard>
-      </div>
-
-      <ComponentGuard requiredKeys={[PERMISSIONS.Event.List.Active]}>
-        <DashboardEvents />
-      </ComponentGuard>
-
-      <div>
-        <DashboardCharts />
-      </div>
     </div>
   );
 }

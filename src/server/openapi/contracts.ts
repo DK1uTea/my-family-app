@@ -10,6 +10,7 @@ export type ApiContract = {
   summary: string;
   operationId: string;
   description?: string;
+  parameters?: Array<{ name: string; in: "path"; required: true; schema: z.ZodType }>;
   requestBody?: z.ZodType;
   responses: Record<string, { description: string; schema?: z.ZodType }>;
 };
@@ -88,7 +89,7 @@ export const apiContracts: ApiContract[] = [
     responses: { "200": { description: "Auth cookies are cleared", schema: z.object({ message: z.literal("Cookies cleared") }) } },
   },
   {
-    method: "get", path: "/api/user/me", tags: ["Users"],
+    method: "get", path: "/api/users/me", tags: ["Users"],
     summary: "Get the authenticated user profile", operationId: "getCurrentUser",
     responses: {
       "200": { description: "Authenticated user and preferences", schema: jsonObject },
@@ -96,10 +97,47 @@ export const apiContracts: ApiContract[] = [
       "404": { description: "User was not found", schema: statusMessage },
     },
   },
+  {
+    method: "get", path: "/api/permissions", tags: ["Roles"],
+    summary: "List action permissions", operationId: "listModulePermissions",
+    responses: { "200": { description: "Hierarchical module and action permission catalog", schema: jsonObject }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required", schema: statusMessage } },
+  },
+  {
+    method: "get", path: "/api/roles", tags: ["Roles"],
+    summary: "List roles", operationId: "listRoles",
+    responses: { "200": { description: "Roles", schema: jsonObject }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required", schema: statusMessage } },
+  },
+  {
+    method: "post", path: "/api/roles", tags: ["Roles"],
+    summary: "Create a role", operationId: "createRole",
+    requestBody: z.object({ key: z.string(), name: z.string(), permissionKeys: z.array(z.string()) }),
+    responses: { "201": { description: "Role created", schema: jsonObject }, "400": { description: "Invalid input", schema: statusMessage }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required", schema: statusMessage }, "409": { description: "Duplicate or invalid role", schema: statusMessage } },
+  },
+  {
+    method: "get", path: "/api/roles/{key}", tags: ["Roles"],
+    summary: "Get a role", operationId: "getRole",
+    parameters: [{ name: "key", in: "path", required: true, schema: z.string() }],
+    responses: { "200": { description: "Role", schema: jsonObject }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required", schema: statusMessage }, "404": { description: "Role not found", schema: statusMessage } },
+  },
+  {
+    method: "put", path: "/api/roles/{key}", tags: ["Roles"],
+    summary: "Update a role", operationId: "updateRole",
+    parameters: [{ name: "key", in: "path", required: true, schema: z.string() }],
+    requestBody: z.object({ name: z.string(), permissionKeys: z.array(z.string()) }),
+    responses: { "200": { description: "Role updated", schema: jsonObject }, "400": { description: "Invalid input", schema: statusMessage }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required or protected role", schema: statusMessage }, "404": { description: "Role not found", schema: statusMessage } },
+  },
+  {
+    method: "put", path: "/api/users/{id}/role", tags: ["Roles"],
+    summary: "Assign a user role", operationId: "assignUserRole",
+    parameters: [{ name: "id", in: "path", required: true, schema: z.uuid() }],
+    requestBody: z.object({ roleKey: z.string() }),
+    responses: { "200": { description: "Role assigned", schema: statusMessage }, "400": { description: "Invalid input", schema: statusMessage }, "401": { description: "Authentication required", schema: statusMessage }, "403": { description: "Admin role required", schema: statusMessage }, "404": { description: "User or role not found", schema: statusMessage } },
+  },
 ];
 
 export const apiTags = [
   { name: "Health", description: "Application health and connectivity" },
   { name: "Auth", description: "Authentication endpoints" },
   { name: "Users", description: "User profile endpoints" },
+  { name: "Roles", description: "Role and action permission administration" },
 ];

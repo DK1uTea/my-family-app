@@ -74,6 +74,10 @@ function buildDocument() {
       summary: contract.summary,
       operationId: contract.operationId,
       ...(contract.description ? { description: contract.description } : {}),
+      ...(contract.parameters ? { parameters: contract.parameters.map(parameter => ({
+        name: parameter.name, in: parameter.in, required: parameter.required,
+        schema: jsonSchema(parameter.schema),
+      })) } : {}),
       ...(contract.requestBody ? { requestBody: { required: true, content: { "application/json": { schema: jsonSchema(contract.requestBody) } } } } : {}),
       responses,
     };

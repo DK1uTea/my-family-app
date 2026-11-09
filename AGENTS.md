@@ -94,7 +94,7 @@ Dev and QA run in parallel off the same approved spec, not sequentially.
 | ----- | ----- | --------------------- |
 | **SPEC** | `spec-driven-development` | Human-approved spec: UI `docs/specs/<feature>.md`; backend `src/server/modules/<domain>/SPEC.md` |
 | **DEV** (parallel with QA) | `test-driven-development` | `pnpm test`, `pnpm typecheck`, `pnpm lint` pass against existing QA test cases |
-| **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | Every behaviour bullet has a test case that failed for the right reason first |
+| **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | New/changed behaviour has QA-owned RED evidence against the pre-change baseline; unchanged refactors are reported accurately |
 | **VERIFY** | `browser-verification-playwright` | Console clean, both locales, `pnpm test:e2e` passes |
 | **SYNC** | `agent-rules-sync` | Every mirrored file updated and listed |
 

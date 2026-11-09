@@ -34,7 +34,7 @@ Non-trivial work follows this route. The map lives in `.claude/skills/feature-wo
 | ----- | ----- | --------------------- |
 | **SPEC** | `spec-driven-development` | Human-approved spec: UI `docs/specs/<feature>.md`; backend `src/server/modules/<domain>/SPEC.md` |
 | **DEV** (parallel with QA) | `test-driven-development` | `pnpm test`, `pnpm typecheck`, `pnpm lint` pass against existing QA test cases |
-| **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | Every behaviour bullet has a test case that failed for the right reason first |
+| **QA** (parallel with DEV) | `test-driven-development`, `e2e-module-testing` | New/changed behaviour has QA-owned RED evidence against the pre-change baseline; unchanged refactors are reported accurately |
 | **VERIFY** | `browser-verification-playwright` | Console clean, both locales, `pnpm test:e2e` passes |
 | **SYNC** | `agent-rules-sync` | Every mirrored file updated and listed |
 
@@ -86,7 +86,7 @@ the RED-to-GREEN workflow.
 
 ## Testing — Mandatory, Owned by QA
 
-**QA owns every test case — unit/component (Vitest) and E2E (Playwright) alike.** Dev implements against the approved module spec and never creates, edits, or deletes a test file; QA never edits implementation source under `src/`; it may update `src/server/modules/<domain>/SPEC.md` as documentation only. Every behaviour change still requires a failing test first — it is just QA's test, not dev's. No exceptions unless the human explicitly says to skip. Full rules, including the role split, in `.claude/skills/test-driven-development/SKILL.md`.
+**QA owns every test case — unit/component (Vitest) and E2E (Playwright) alike.** Dev implements against the approved module spec and never creates, edits, or deletes a test file; QA never edits implementation source under `src/`; it may update backend module `SPEC.md` files as documentation. For new or changed behavior, QA records a failing test against the pre-change baseline; parallel QA/dev work uses separate branches or worktrees to preserve that evidence. Pure refactors and behavior already present do not get an artificial RED claim: record the baseline result and verify after the change. Full rules are in `.claude/skills/test-driven-development/SKILL.md`.
 
 | Kind | Location | Extension | Runner |
 | ---- | -------- | --------- | ------ |

@@ -1,11 +1,3 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { handleClearCookies } from "../auth/_controllers/clear-cookies.controller";
 
-export async function PUT() {
-  const cookieStore = await cookies();
-
-  cookieStore.delete('accessToken');
-  cookieStore.delete('refreshToken');
-
-  return NextResponse.json({ message: 'Cookies cleared' });
-}
+export const PUT = handleClearCookies;

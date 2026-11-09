@@ -18,11 +18,10 @@ type MeData = {
   lastName: string;
   avatar?: string;
   lastLoginAt?: string;
-  permissions?: string[];
   role?: {
     key?: string;
-    permissions?: string[];
-    navbar?: string[];
+    navbar?: string[] | null;
+    permissions?: string[] | null;
   };
   settings: {
     preferredLanguage: string;
@@ -34,7 +33,7 @@ type MeData = {
 };
 
 async function fetchMe(): Promise<MeData> {
-  const response = await apiProxy.get("/user/me");
+  const response = await apiProxy.get("/users/me");
   return response.data.data as MeData;
 }
 
@@ -67,7 +66,7 @@ export function useMe() {
 
       lastAppliedPreferencesAt.current = query.dataUpdatedAt;
 
-      const { id, email, firstName, lastName, settings, avatar, lastLoginAt, permissions, role } = query.data;
+      const { id, email, firstName, lastName, settings, avatar, lastLoginAt, role } = query.data;
       const name = [firstName, lastName].filter(Boolean).join(" ");
       const preferredLanguage = normalizeLocale(settings?.preferredLanguage);
       const appearance = normalizeAppearance(
@@ -79,12 +78,12 @@ export function useMe() {
         appearance,
         dateFormat: settings?.dateFormat,
         currency: {
-          code: settings?.currency ?? "EUR",
-          symbol: settings?.currency === "EUR" || !settings?.currency ? "€" : settings?.currency,
+          code: settings?.currency ?? "VND",
+          symbol: settings?.currency === "VND" || !settings?.currency ? "₫" : settings.currency === "EUR" ? "€" : settings.currency,
         },
       });
-      setPermissions(permissions ?? role?.permissions ?? []);
-      setNavbar(role?.navbar ?? []);
+      setPermissions(Array.isArray(role?.permissions) ? role.permissions : []);
+      setNavbar(Array.isArray(role?.navbar) ? role.navbar : []);
       setLocale(preferredLanguage);
       setAppearance(appearance);
       setTheme(appearance);

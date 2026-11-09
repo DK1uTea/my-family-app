@@ -6,12 +6,21 @@ import {
   type UserProfileRecord,
   type UsersRepository,
 } from "@/server/layer-data/users";
+import { getNavbarPermissions } from "@/server/modules/roles/permissions";
 
 export class UsersService {
   constructor(private readonly repo: UsersRepository = usersRepository) {}
 
   async findProfileById(userId: string): Promise<UserProfileRecord | null> {
-    return this.repo.findProfileById(userId);
+    const profile = await this.repo.findProfileById(userId);
+    if (!profile?.role) return profile;
+    const permissions = Array.isArray(profile.role.permissions)
+      ? profile.role.permissions
+      : [];
+    return {
+      ...profile,
+      role: { ...profile.role, permissions, navbar: getNavbarPermissions(permissions) },
+    };
   }
 
   async updateProfile(

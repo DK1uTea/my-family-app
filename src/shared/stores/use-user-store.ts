@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { type DateFormat, DEFAULT_DATE_FORMAT } from "@/lib/date-utils";
-import { PERMISSION_ALL_WILDCARD } from "@/shared/constants/permissions";
 
 export type { DateFormat };
 
@@ -41,7 +40,7 @@ type UserStore = {
   setNavbar: (navbar: string[]) => void;
 };
 
-export const DEFAULT_CURRENCY: Currency = { code: "EUR", symbol: "€" };
+export const DEFAULT_CURRENCY: Currency = { code: "VND", symbol: "₫" };
 
 export const useUserStore = create<UserStore>((set) => ({
   user: {},
@@ -64,6 +63,15 @@ export const useUserStore = create<UserStore>((set) => ({
   setNavbar: (navbar) => set({ navbar }),
 }));
 
+export function useHasPermission(keys: string | string[]): boolean {
+  return useUserStore((state) => {
+    if (state.permissions === null) return true;
+    if (state.permissions.includes('*')) return true;
+    const required = Array.isArray(keys) ? keys : [keys];
+    return required.some((key) => state.permissions?.includes(key));
+  });
+}
+
 /** Convenience selector — use this in components: `const { symbol } = useCurrency()` */
 export function useCurrency(): Currency {
   return useUserStore((s) => s.preferences.currency);
@@ -72,14 +80,4 @@ export function useCurrency(): Currency {
 /** Convenience selector — use this in components: `const dateFormat = useDateFormat()` */
 export function useDateFormat(): DateFormat {
   return useUserStore((s) => s.preferences.dateFormat);
-}
-
-/** Returns true if the user has at least one of the given permission keys (OR logic). Wildcard `*` grants all. null = not loaded yet → returns true to avoid blocking during initial load. */
-export function useHasPermission(keys: string | string[]): boolean {
-  return useUserStore((s) => {
-    if (s.permissions === null) return true;
-    if (s.permissions.includes(PERMISSION_ALL_WILDCARD)) return true;
-    const required = Array.isArray(keys) ? keys : [keys];
-    return required.some((k) => s.permissions!.includes(k));
-  });
 }
