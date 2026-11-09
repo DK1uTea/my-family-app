@@ -11,8 +11,9 @@ export type UserPreferencesRecord = {
 
 export type UserRoleRecord = {
   key?: string;
-  permissions?: string[];
+  name?: string;
   navbar?: string[] | null;
+  permissions?: string[] | null;
 };
 
 /** Persistence-neutral current-user profile shape based on the existing FE contract. */
@@ -23,7 +24,6 @@ export type UserProfileRecord = {
   lastName: string;
   avatar: string | null;
   lastLoginAt: string | null;
-  permissions?: string[];
   role?: UserRoleRecord;
   preferences: UserPreferencesRecord;
 };

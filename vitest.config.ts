@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -16,7 +17,10 @@ export default defineConfig({
   plugins: [react()],
   // Resolves the `@/*` alias straight from tsconfig.json, so a test importing
   // `@/lib/utils` needs no relative path back into src.
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: { 'server-only': resolve('scripts/server-only-test-stub.ts') },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],

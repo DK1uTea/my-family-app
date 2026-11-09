@@ -21,12 +21,8 @@ type NavLabelKey = Parameters<ReturnType<typeof useTranslations<'navigation'>>>[
 
 /** Maps a top-level route segment to its translation key in the `navigation` namespace. */
 const SEGMENT_NAV_KEYS: Record<string, NavLabelKey> = {
-  'calendar-dashboard': 'calendarDashboardBreadcrumb',
-  events: 'eventsBreadcrumb',
-  rent: 'rentBreadcrumb',
-  'customer-activation': 'customerActivation',
-  'reporting-tool': 'reportingTool',
-  'user-settings': 'userSettings',
+  'event-timeline': 'eventTimeline',
+  settings: 'userSettings',
 }
 
 export function AppBreadcrumbs() {

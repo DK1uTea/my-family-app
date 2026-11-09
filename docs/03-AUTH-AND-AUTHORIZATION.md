@@ -88,11 +88,11 @@ export async function login(dto: LoginDto) {
 
 ## Locale Sync (post-login locale redirect)
 
-`useMe()` (`src/features/auth/(hooks)/use-me.ts`) fetches `/user/me` directly via `apiProxy` and applies the user's preferred language/appearance/permissions on load — no dedicated `<LocaleSync>` wrapper involved:
+`useMe()` (`src/features/auth/(hooks)/use-me.ts`) fetches `/users/me` directly via `apiProxy` and applies the user's preferred language/appearance/permissions on load — no dedicated `<LocaleSync>` wrapper involved:
 
 ```tsx
 async function fetchMe(): Promise<MeData> {
-  const response = await apiProxy.get('/user/me');
+  const response = await apiProxy.get('/users/me');
   return response.data.data as MeData;
 }
 

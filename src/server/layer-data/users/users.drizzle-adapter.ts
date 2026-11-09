@@ -3,7 +3,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { DateFormat } from "@/lib/date-utils";
 import { nowUtc } from "@/lib/date-utils";
-import { userPreferences, users } from "@/server/drizzle/schema";
+import { roles, userPreferences, users } from "@/server/drizzle/schema";
 import { db } from "@/server/third-party/drizzle/client";
 import type { UsersRepository } from "./users.repository";
 import type {
@@ -15,7 +15,7 @@ import type {
 const DEFAULT_PREFERENCES: UserPreferencesRecord = {
   preferredLanguage: "vi",
   appearance: "light",
-  currency: "EUR",
+  currency: "VND",
   dateFormat: "DD/MM/YYYY",
 };
 
@@ -29,6 +29,12 @@ export class DrizzleUsersRepository implements UsersRepository {
 
     const user = userRows[0];
     if (!user) return null;
+
+    const roleRows = user.roleKey
+      ? await db.select().from(roles).where(eq(roles.key, user.roleKey)).limit(1)
+      : [];
+    const role = roleRows[0];
+    const permissionKeys = Array.isArray(role?.permissionKeys) ? role.permissionKeys : [];
 
     const prefRows = await db
       .select()
@@ -56,11 +62,10 @@ export class DrizzleUsersRepository implements UsersRepository {
       lastName: user.lastName,
       avatar: user.avatar,
       lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
-      permissions: user.permissions ?? [],
       role: {
-        key: user.roleKey ?? "admin",
-        permissions: user.permissions ?? [],
-        navbar: user.navbar,
+        key: role?.key,
+        name: role?.name,
+        permissions: permissionKeys,
       },
       preferences,
     };
@@ -88,7 +93,7 @@ export class DrizzleUsersRepository implements UsersRepository {
           userId,
           preferredLanguage: update.preferences.preferredLanguage ?? "vi",
           appearance: update.preferences.appearance ?? "light",
-          currency: update.preferences.currency ?? "EUR",
+          currency: update.preferences.currency ?? "VND",
           dateFormat: update.preferences.dateFormat ?? "DD/MM/YYYY",
         })
         .onConflictDoUpdate({

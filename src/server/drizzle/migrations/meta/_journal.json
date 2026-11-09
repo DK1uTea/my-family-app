@@ -22,6 +22,48 @@
       "when": 1793506259304,
       "tag": "0002_cooing_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793781418282,
+      "tag": "20261104083658_add_role_module_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793781659510,
+      "tag": "20261104084059_link_users_to_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793782482826,
+      "tag": "20261104085442_remove_default_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793784085428,
+      "tag": "20261104092115_normalize_saved_currency_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794196923000,
+      "tag": "20261109040203_seed_adult_child_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794200879367,
+      "tag": "20261109050759_add_action_permissions",
+      "breakpoints": true
     }
   ]
 }

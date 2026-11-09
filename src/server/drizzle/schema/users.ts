@@ -9,6 +9,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+export const roles = pgTable("roles", {
+  key: varchar("key", { length: 50 }).primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  moduleKeys: jsonb("module_keys").$type<string[]>().default([]).notNull(),
+  permissionKeys: jsonb("permission_keys").$type<string[]>().default([]).notNull(),
+});
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: varchar("email", { length: 255 }).unique().notNull(),
@@ -16,7 +23,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 100 }).notNull(),
   lastName: varchar("last_name", { length: 100 }).notNull(),
   avatar: text("avatar"),
-  roleKey: varchar("role_key", { length: 50 }).default("admin"),
+  roleKey: varchar("role_key", { length: 50 }).references(() => roles.key),
   permissions: jsonb("permissions").$type<string[]>().default([]),
   navbar: jsonb("navbar").$type<string[] | null>().default(null),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
@@ -37,7 +44,7 @@ export const userPreferences = pgTable("user_preferences", {
     .default("vi")
     .notNull(),
   appearance: varchar("appearance", { length: 10 }).default("light").notNull(),
-  currency: varchar("currency", { length: 10 }).default("EUR").notNull(),
+  currency: varchar("currency", { length: 10 }).default("VND").notNull(),
   dateFormat: varchar("date_format", { length: 20 })
     .default("DD/MM/YYYY")
     .notNull(),

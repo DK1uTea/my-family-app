@@ -1,35 +1,23 @@
-import { describe, expect, it } from 'vitest'
-
+import { describe, expect, it } from 'vitest';
 import {
-  EVENT_ACCESS_KEYS,
-  PERMISSIONS,
-  PERMISSIONS_TREE,
-} from '@/shared/constants/permissions'
+  ModuleKey,
+  PermissionKey,
+  PERMISSION_ALL_WILDCARD,
+} from '@/shared/constants/permissions';
 
-describe('event list permissions', () => {
-  it('defines a permission for each event list status', () => {
-    expect(PERMISSIONS.Event.List).toEqual({
-      Draft: 'event.list.draft',
-      Active: 'event.list.active',
-      Deleted: 'event.list.deleted',
-    })
-  })
+describe('frontend permission keys', () => {
+  it('uses stable Event Timeline module and action keys', () => {
+    expect(ModuleKey.EventTimeline).toBe('event-timeline');
+    expect(PermissionKey.EventTimeline).toEqual({
+      Read: 'event-timeline.read',
+      Create: 'event-timeline.create',
+      Edit: 'event-timeline.edit',
+      Delete: 'event-timeline.delete',
+    });
+  });
 
-  it('exposes each event list status as a module access key', () => {
-    expect(EVENT_ACCESS_KEYS).toEqual(expect.arrayContaining([
-      PERMISSIONS.Event.List.Draft,
-      PERMISSIONS.Event.List.Active,
-      PERMISSIONS.Event.List.Deleted,
-    ]))
-  })
-
-  it('shows the three status permissions in the role permission tree', () => {
-    const eventManagement = PERMISSIONS_TREE.find((group) => group.name === 'Event Management')
-
-    expect(eventManagement?.children.map((child) => child.key)).toEqual(expect.arrayContaining([
-      'event.list.draft',
-      'event.list.active',
-      'event.list.deleted',
-    ]))
-  })
-})
+  it('keeps the admin wildcard separate from module and action keys', () => {
+    expect(PERMISSION_ALL_WILDCARD).toBe('*');
+    expect(Object.values(PermissionKey.EventTimeline)).not.toContain(PERMISSION_ALL_WILDCARD);
+  });
+});

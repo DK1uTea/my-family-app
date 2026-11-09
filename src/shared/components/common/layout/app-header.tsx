@@ -28,7 +28,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b border-border bg-background-header px-6 py-3">
       {/* Mobile: logo */}
       <div className="md:hidden">
-        <Image src="/images/logo_green.png" alt="CCEP" width={800} height={143} priority className="object-contain w-auto h-15" />
+        <Image src="/images/logo_green.png" alt={tCommon('logoAlt')} width={800} height={143} priority className="object-contain w-auto h-15" />
       </div>
 
       {/* Desktop: breadcrumbs */}
@@ -68,18 +68,18 @@ function UserMenu({ userSettingsLabel }: { userSettingsLabel: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative outline-none">
+        <button type="button" aria-label={userSettingsLabel} className="relative rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
           <Avatar className="size-10">
-            <AvatarImage src={user.avatar || undefined} alt={displayName || user.email || 'User'} />
+            <AvatarImage src={user.avatar || undefined} alt={displayName || user.email || userSettingsLabel} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
-          <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-background bg-green-500" />
+          <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-background bg-primary" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <div className="flex items-center gap-3 p-3">
           <Avatar className="size-10">
-            <AvatarImage src={user.avatar || undefined} alt={displayName || user.email || 'User'} />
+            <AvatarImage src={user.avatar || undefined} alt={displayName || user.email || userSettingsLabel} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
@@ -89,7 +89,7 @@ function UserMenu({ userSettingsLabel }: { userSettingsLabel: string }) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/user-settings">
+          <Link href="/settings">
             <IconUserSettings className="size-4" />
             {userSettingsLabel}
           </Link>

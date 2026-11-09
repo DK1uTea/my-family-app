@@ -30,7 +30,7 @@ export function MaintenanceView({ fullPage = true, onRetry }: Props) {
       <div className="flex flex-col items-center text-center">
         <div className={cn('flex items-center flex-col text-center')}>
           <Image
-            src="/images/maintenance.webp"
+            src="/images/maintenance.png"
             alt="maintenance"
             width={500}
             height={500}

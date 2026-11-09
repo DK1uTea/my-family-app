@@ -4,9 +4,9 @@
 
 :root {
   /* --- Typography --- */
-  --font-family-brand: 'CCEP Rhythm', system-ui, sans-serif;
-  --font-family-brand-narrow: 'CCEP Rhythm Narrow', 'CCEP Rhythm', system-ui, sans-serif;
-  --font-family-brand-wide: 'CCEP Rhythm Wide', 'CCEP Rhythm', system-ui, sans-serif;
+  --font-family-brand: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+  --font-family-brand-narrow: var(--font-family-brand);
+  --font-family-brand-wide: var(--font-family-brand);
 
   /* --- Page background & default text --- */
   --background: oklch(0.985 0.002 247.8);          /* #F9FAFB */

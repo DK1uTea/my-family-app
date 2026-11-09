@@ -1,9 +1,10 @@
 # Server architecture
 
 This is server-side application code inside the existing Next.js app, not a second
-NestJS service. Next.js App Router Route Handlers under `src/app/api/` own HTTP methods,
-headers, cookies, status codes, and response serialization. They delegate domain work to
-the server modules.
+NestJS service. Next.js App Router Route Handlers under `src/app/api/` register HTTP
+methods and route policies. Module controllers in the same API boundary own request
+parsing, validation, cookies, status codes, and response serialization. Controllers
+delegate domain work to server modules.
 
 ```text
 src/
@@ -27,16 +28,18 @@ src/
 
 ## Dependency direction
 
-- `app/api` is an adapter: validate and parse the request, invoke a module, map its result
-  to an HTTP response. Do not put domain decisions or SQL in a route handler.
+- `app/api` is an adapter: `route.ts` maps methods and auth policy to a controller;
+  controllers parse/validate requests, invoke a module, and map results to HTTP responses.
+  Do not put domain decisions or SQL in a route handler/controller.
 - `modules/<domain>` owns use cases and domain behavior. Its `SPEC.md` is the source of
   truth for the module's endpoint contract and requirements.
 - `layer-data/<domain>` owns repository interfaces and their implementations. A module
   depends on the interface, not on a Neon SDK.
 - `third-party` owns the shared Drizzle client configured with Neon driver;
   domain-specific Drizzle repository adapters belong in `layer-data/<domain>`.
-- Request flow is Route Handler -> module service/use case -> repository contract -> Drizzle
-  repository adapter -> shared Drizzle client -> Neon. Routes and services do not query Drizzle.
+- Request flow is Route Handler -> API controller -> module service/use case -> repository
+  contract -> Drizzle repository adapter -> shared Drizzle client -> Neon. Routes, controllers,
+  and services do not query Drizzle.
 - `core` and `config` hold cross-domain primitives and validated environment values.
 - Server modules import `server-only`; client components must not import `src/server/`.
 
@@ -45,8 +48,9 @@ not need Nest decorators, modules, a DI container, or a second runtime.
 
 ## Current state and decisions
 
-- `auth` and `users` have typed repository contracts and module boundaries. Their
-  behavior is specified but the first-party auth endpoints are not implemented yet.
+- `auth`, `users`, and `roles` have typed repository contracts and module boundaries.
+  First-party login/session and user/role endpoints delegate to these modules; invitation
+  and password-recovery flows retain their existing integrations.
 - Neon Postgres is the selected cloud database. `DATABASE_URL` is pooled for runtime;
   `DATABASE_URL_UNPOOLED` is reserved for direct connections such as migrations.
 - Drizzle ORM is selected, with Neon serverless driver for runtime database access.
@@ -55,8 +59,8 @@ not need Nest decorators, modules, a DI container, or a second runtime.
   `src/server/drizzle/schema/`.
 - OpenAPI contracts live in `src/server/openapi/contracts.ts`; the generated document is
   served as `/api/openapi.json` and rendered with Swagger UI at `/api/docs`.
-- Existing auth handlers and the catch-all external API proxy remain in place until the
-  first-party endpoint migration is implemented module by module.
+- Remaining legacy endpoints continue through the catch-all external API proxy while
+  first-party business endpoints use route-to-controller-to-module delegation.
 
 ## Neon branch safety
 
