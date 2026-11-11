@@ -11,6 +11,7 @@ import {
   MODULE_PERMISSIONS,
   PERMISSION_ALL_WILDCARD,
   PERMISSION_KEYS,
+  ServerModuleKey,
   UserRole,
   type UserRole as UserRoleType,
 } from './permissions';
@@ -23,23 +24,24 @@ export type RoleUpdateResult =
   | { kind: "reserved" }
   | { kind: "not_found" };
 
+const BUILT_IN_ROLES = new Set<string>(Object.values(UserRole));
+
 export class RolesService {
   constructor(private readonly repo: RolesRepository = rolesRepository) {}
 
   async isAdmin(userId: string): Promise<boolean> {
     const role = await this.findUserRole(userId);
-    return role?.key === UserRole.ADMIN
-      && Array.isArray(role.permissionKeys)
-      && role.permissionKeys.includes(PERMISSION_ALL_WILDCARD);
+    return role?.key === UserRole.ADMIN;
+  }
+
+  async isSuperAdmin(userId: string): Promise<boolean> {
+    const role = await this.findUserRole(userId);
+    return role?.key === UserRole.SUPER_ADMIN;
   }
 
   async hasAnyRole(userId: string, requiredRoles: readonly UserRoleType[]): Promise<boolean> {
     const role = await this.findUserRole(userId);
-    if (!role || !Array.isArray(role.permissionKeys)) return false;
-    if (role.key === UserRole.ADMIN && role.permissionKeys.includes(PERMISSION_ALL_WILDCARD)) {
-      return true;
-    }
-    return requiredRoles.includes(role.key as UserRoleType);
+    return Boolean(role && requiredRoles.includes(role.key as UserRoleType));
   }
 
   async canAccess(userId: string, moduleKey: string): Promise<boolean> {
@@ -76,11 +78,14 @@ export class RolesService {
   }
 
   validPermissionKeys(keys: string[]): boolean {
-    return keys.every((key) => PERMISSION_KEYS.includes(key as (typeof PERMISSION_KEYS)[number]));
+    return keys.every((key) =>
+      PERMISSION_KEYS.includes(key as (typeof PERMISSION_KEYS)[number])
+      && !key.startsWith(`${ServerModuleKey.TenantManagement}.`),
+    );
   }
 
   async create(input: RoleInput): Promise<RoleRecord | null> {
-    if (input.key === UserRole.ADMIN || !this.validPermissionKeys(input.permissionKeys)) return null;
+    if (BUILT_IN_ROLES.has(input.key) || !this.validPermissionKeys(input.permissionKeys)) return null;
     if (await this.repo.findByKey(input.key)) return null;
     return this.repo.create({
       ...input,
@@ -92,7 +97,7 @@ export class RolesService {
     key: string,
     input: Pick<RoleInput, 'name' | 'permissionKeys'>,
   ): Promise<RoleRecord | null> {
-    if (key === UserRole.ADMIN || !this.validPermissionKeys(input.permissionKeys)) return null;
+    if (BUILT_IN_ROLES.has(key) || !this.validPermissionKeys(input.permissionKeys)) return null;
     return this.repo.update(key, {
       ...input,
       permissionKeys: [...new Set(input.permissionKeys)],
@@ -106,12 +111,13 @@ export class RolesService {
     if (!this.validPermissionKeys(input.permissionKeys)) {
       return { kind: "invalid_permissions" };
     }
-    if (key === UserRole.ADMIN) return { kind: "reserved" };
+    if (BUILT_IN_ROLES.has(key)) return { kind: "reserved" };
     const role = await this.update(key, input);
     return role ? { kind: "updated", role } : { kind: "not_found" };
   }
 
   async assign(userId: string, roleKey: string): Promise<boolean> {
+    if (roleKey === UserRole.SUPER_ADMIN) return false;
     if (!await this.repo.findByKey(roleKey)) return false;
     return this.repo.assign(userId, roleKey);
   }
@@ -121,9 +127,21 @@ export class RolesService {
     targetUserId: string,
     roleKey: string,
   ): Promise<RoleAssignmentResult> {
+    const actorRole = await this.repo.findUserRoleKey(actorId);
+    if (actorRole !== UserRole.ADMIN && actorRole !== UserRole.SUPER_ADMIN) return "forbidden";
+    if (roleKey === UserRole.SUPER_ADMIN) return "forbidden";
     if (actorId === targetUserId && roleKey !== UserRole.ADMIN) return "forbidden";
     if (!await this.repo.findByKey(roleKey)) return "not_found";
-    return await this.repo.assign(targetUserId, roleKey) ? "assigned" : "not_found";
+    if (actorRole === UserRole.SUPER_ADMIN) {
+      const targetTenantId = await this.repo.findUserTenantId(targetUserId);
+      if (!targetTenantId) return "not_found";
+      return await this.repo.assign(targetUserId, roleKey) ? "assigned" : "not_found";
+    }
+    const tenantId = await this.repo.findUserTenantId(actorId);
+    if (!tenantId) return "forbidden";
+    return await this.repo.assignWithinTenant(targetUserId, tenantId, roleKey)
+      ? "assigned"
+      : "not_found";
   }
 
   private async findUserRole(userId: string): Promise<RoleRecord | null> {

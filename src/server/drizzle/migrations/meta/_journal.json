@@ -64,6 +64,27 @@
       "when": 1794200879367,
       "tag": "20261109050759_add_action_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794219982358,
+      "tag": "20261109102622_add_tenant_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794243024961,
+      "tag": "20261109165024_remove_legacy_user_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794287206591,
+      "tag": "20261110050646_add_tenant_description",
+      "breakpoints": true
     }
   ]
 }

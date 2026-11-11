@@ -8,6 +8,7 @@ export type {
 } from "@/server/layer-data/auth";
 
 export type {
+  AuthenticatedActor,
   LoginInput,
   LoginResult,
   RefreshResult,

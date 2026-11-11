@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { rolesService } from "@/server/modules/roles";
+import { apiError } from "@/app/api/_shared/error-response";
 
 type RoleContext = { params: Promise<{ key: string }> };
 
@@ -24,14 +25,14 @@ export const rolesController = {
   async create(req: NextRequest): Promise<Response> {
     const parsed = createRoleSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json({ status: 400, message: "Invalid role" }, { status: 400 });
+      return apiError(400, "ROLE_INVALID");
     }
     if (!rolesService.validPermissionKeys(parsed.data.permissionKeys)) {
-      return NextResponse.json({ status: 400, message: "Unknown role permission" }, { status: 400 });
+      return apiError(400, "ROLE_UNKNOWN_PERMISSION");
     }
     const role = await rolesService.create(parsed.data);
     if (!role) {
-      return NextResponse.json({ status: 409, message: "Role already exists or is reserved" }, { status: 409 });
+      return apiError(409, "ROLE_ALREADY_EXISTS");
     }
     return NextResponse.json({ status: 201, message: "Created", data: { role } }, { status: 201 });
   },
@@ -40,7 +41,7 @@ export const rolesController = {
     const { key } = await context.params;
     const role = await rolesService.findByKey(key);
     if (!role) {
-      return NextResponse.json({ status: 404, message: "Role not found" }, { status: 404 });
+      return apiError(404, "ROLE_NOT_FOUND");
     }
     return NextResponse.json({ status: 200, message: "OK", data: { role } });
   },
@@ -48,18 +49,18 @@ export const rolesController = {
   async update(req: NextRequest, _actorId: string, context: RoleContext): Promise<Response> {
     const parsed = updateRoleSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json({ status: 400, message: "Invalid role" }, { status: 400 });
+      return apiError(400, "ROLE_INVALID");
     }
     const { key } = await context.params;
     const result = await rolesService.updateForAdmin(key, parsed.data);
     if (result.kind === "invalid_permissions") {
-      return NextResponse.json({ status: 400, message: "Unknown role permission" }, { status: 400 });
+      return apiError(400, "ROLE_UNKNOWN_PERMISSION");
     }
     if (result.kind === "reserved") {
-      return NextResponse.json({ status: 403, message: "Admin role cannot be edited" }, { status: 403 });
+      return apiError(403, "ROLE_RESERVED");
     }
     if (result.kind === "not_found") {
-      return NextResponse.json({ status: 404, message: "Role not found" }, { status: 404 });
+      return apiError(404, "ROLE_NOT_FOUND");
     }
     return NextResponse.json({ status: 200, message: "OK", data: { role: result.role } });
   },

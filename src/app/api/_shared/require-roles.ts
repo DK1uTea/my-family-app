@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticated } from '@/app/api/_shared/require-authenticated';
 import { rolesService } from '@/server/modules/roles';
 import type { UserRole } from '@/server/modules/roles';
+import { apiError } from '@/app/api/_shared/error-response';
 
 type AuthenticatedHandler<Context> = (
   req: NextRequest,
@@ -22,15 +23,15 @@ export function withAccessPolicy<Context = unknown>(
     const actorId = await requireAuthenticated(req);
     if (actorId instanceof NextResponse) return actorId;
 
-    if (policy.roles?.length && !await rolesService.hasAnyRole(actorId, policy.roles)) {
-      return NextResponse.json({ status: 403, message: 'Forbidden' }, { status: 403 });
+    if (policy.roles?.length && !await rolesService.hasAnyRole(actorId.userId, policy.roles)) {
+      return apiError(403, 'AUTH_INSUFFICIENT_PERMISSION');
     }
     if (policy.permissions?.length
-      && !await rolesService.canAccessAnyPermission(actorId, policy.permissions)) {
-      return NextResponse.json({ status: 403, message: 'Forbidden' }, { status: 403 });
+      && !await rolesService.canAccessAnyPermission(actorId.userId, policy.permissions)) {
+      return apiError(403, 'AUTH_INSUFFICIENT_PERMISSION');
     }
 
-    return handler(req, actorId, context);
+    return handler(req, actorId.userId, context);
   };
 }
 

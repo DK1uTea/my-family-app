@@ -2,11 +2,12 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { nowUtc } from "@/lib/date-utils";
-import { refreshTokens, users } from "@/server/drizzle/schema";
+import { refreshTokens, tenants, users } from "@/server/drizzle/schema";
 import { db } from "@/server/third-party/drizzle/client";
 import type { AuthRepository } from "./auth.repository";
 import type {
   AuthCredentialRecord,
+  AuthIdentityRecord,
   CreateRefreshTokenData,
   RefreshTokenRecord,
 } from "./auth.types";
@@ -20,6 +21,9 @@ export class DrizzleAuthRepository implements AuthRepository {
         userId: users.id,
         email: users.email,
         passwordHash: users.passwordHash,
+        roleKey: users.roleKey,
+        tenantId: users.tenantId,
+        tenantIsActive: tenants.isActive,
         isLocked: users.isLocked,
         lockedUntil: users.lockedUntil,
         failedAttempts: users.failedAttempts,
@@ -27,9 +31,23 @@ export class DrizzleAuthRepository implements AuthRepository {
         mustChangePassword: users.mustChangePassword,
       })
       .from(users)
+      .leftJoin(tenants, eq(users.tenantId, tenants.id))
       .where(eq(users.email, email.toLowerCase().trim()))
       .limit(1);
 
+    return records[0] ?? null;
+  }
+
+  async findIdentityById(userId: string): Promise<AuthIdentityRecord | null> {
+    const records = await db.select({
+      userId: users.id,
+      email: users.email,
+      roleKey: users.roleKey,
+      tenantId: users.tenantId,
+      tenantIsActive: tenants.isActive,
+    }).from(users)
+      .leftJoin(tenants, eq(users.tenantId, tenants.id))
+      .where(eq(users.id, userId)).limit(1);
     return records[0] ?? null;
   }
 

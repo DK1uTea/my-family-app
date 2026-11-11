@@ -65,7 +65,8 @@ existing sidebar continues using `role.navbar`.
 - Preserve admin wildcard. Convert existing `event-timeline` module grants to `read`;
   seed adult with all four Event Timeline permissions and child with `read` only.
 - Preserve users' current `role_key` assignments. Do not assign or change a user's role.
-- Legacy user-level `permissions` and `navbar` columns do not grant access.
+- Legacy user-level `permissions` and `navbar` columns were removed; role permissions
+  are the only source of access grants.
 
 ## QA coverage
 

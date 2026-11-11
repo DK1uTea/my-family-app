@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { API_URL } from "@/lib/constant";
+import { apiError } from "@/app/api/_shared/error-response";
 
 function normalizeLocale(locale: unknown) {
   if (typeof locale !== "string") return undefined;
@@ -96,10 +97,7 @@ async function handler(
     });
   } catch (err) {
     console.error(`[proxy] fetch failed → ${targetUrl}`, err);
-    return NextResponse.json(
-      { message: "Backend unreachable", target: targetUrl },
-      { status: 502 },
-    );
+    return apiError(502, "BACKEND_UNREACHABLE");
   }
 
   // console.log({ response })

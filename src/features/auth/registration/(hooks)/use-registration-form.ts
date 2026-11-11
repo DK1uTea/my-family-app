@@ -7,6 +7,7 @@ import { useRouter } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { registrationSchema, type RegistrationFormData } from '../(helpers)/registration-schema'
 import { API_URL } from '@/lib/constant'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 type Props = {
   email: string
@@ -94,7 +95,7 @@ export function useRegistrationForm({ email, code }: Props) {
       const result = await acceptRes.json()
       const message = result?.error_code ?? result?.message
       const text = Array.isArray(message) ? message[0] : message
-      if (text) toast.error(text)
+      toast.error(getErrorMessage(typeof text === 'string' ? text : undefined))
       return
     }
 

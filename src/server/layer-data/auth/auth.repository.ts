@@ -2,6 +2,7 @@ import "server-only";
 
 import type {
   AuthCredentialRecord,
+  AuthIdentityRecord,
   CreateRefreshTokenData,
   RefreshTokenRecord,
 } from "./auth.types";
@@ -9,6 +10,7 @@ import type {
 /** Persistence contract for looking up password-based identities and session tokens. */
 export interface AuthRepository {
   findCredentialByEmail(email: string): Promise<AuthCredentialRecord | null>;
+  findIdentityById(userId: string): Promise<AuthIdentityRecord | null>;
   recordFailedAttempt(
     userId: string,
     currentAttempts: number,

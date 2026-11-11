@@ -33,7 +33,7 @@ describe('requireRoles', () => {
   });
 
   it('returns 403 when the authenticated user lacks the required role', async () => {
-    requireAuthenticated.mockResolvedValue('user-1');
+    requireAuthenticated.mockResolvedValue({ userId: 'user-1' });
     hasAnyRole.mockResolvedValue(false);
     const handler = vi.fn();
 
@@ -43,12 +43,12 @@ describe('requireRoles', () => {
     );
 
     expect(response.status).toBe(403);
-    await expect(response.json()).resolves.toEqual({ status: 403, message: 'Forbidden' });
+    await expect(response.json()).resolves.toEqual({ status: 403, message: 'AUTH_INSUFFICIENT_PERMISSION', error_code: 'AUTH_INSUFFICIENT_PERMISSION' });
     expect(handler).not.toHaveBeenCalled();
   });
 
   it('calls the controller with the authenticated actor when the role is allowed', async () => {
-    requireAuthenticated.mockResolvedValue('admin-1');
+    requireAuthenticated.mockResolvedValue({ userId: 'admin-1' });
     hasAnyRole.mockResolvedValue(true);
     const expected = NextResponse.json({ status: 200 });
     const handler = vi.fn().mockResolvedValue(expected);

@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { getErrorMessage } from "@/lib/get-error-message";
 
 export const useForgotPasswordForm = () => {
   const t = useTranslations("forgotPassword");
@@ -33,7 +34,7 @@ export const useForgotPasswordForm = () => {
       const result = await res.json();
       const message = result?.error_code ?? result?.message;
       const text = Array.isArray(message) ? message[0] : message;
-      if (text) toast.error(text);
+      toast.error(getErrorMessage(typeof text === "string" ? text : undefined));
       return;
     }
 

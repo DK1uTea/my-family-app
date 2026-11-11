@@ -51,7 +51,21 @@ describe('auth proxy controllers', () => {
     }));
   });
 
-  it('maps upstream invite errors to the existing error_code response', async () => {
+  it('preserves a known upstream invite error key in both envelope fields', async () => {
+    mockFetch({ status: 422, message: ['INVITATION_EXPIRED'] });
+
+    const response = await handleAcceptInvite(request(
+      'http://localhost/api/auth/accept-invite',
+      { token: 'expired' },
+    ));
+
+    expect(response.status).toBe(422);
+    await expect(response.json()).resolves.toEqual({
+      status: 422, message: 'INVITATION_EXPIRED', error_code: 'INVITATION_EXPIRED',
+    });
+  });
+
+  it('does not send arbitrary upstream English text as a frontend message', async () => {
     mockFetch({ status: 422, message: 'Invite expired' });
 
     const response = await handleAcceptInvite(request(
@@ -60,7 +74,9 @@ describe('auth proxy controllers', () => {
     ));
 
     expect(response.status).toBe(422);
-    await expect(response.json()).resolves.toEqual({ error_code: 'Invite expired' });
+    await expect(response.json()).resolves.toEqual({
+      status: 422, message: 'UPSTREAM_REQUEST_FAILED', error_code: 'UPSTREAM_REQUEST_FAILED',
+    });
   });
 
   it('issues a registration token from the access token returned by login', async () => {
@@ -77,5 +93,18 @@ describe('auth proxy controllers', () => {
       method: 'POST',
       body: JSON.stringify({ email: 'adult@example.test', password: 'secret' }),
     }));
+  });
+
+  it('returns a translation key when registration token credentials are missing', async () => {
+    const response = await handleRegistrationToken(request(
+      'http://localhost/api/auth/registration-token', { email: 'adult@example.test' },
+    ));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      status: 400,
+      message: 'AUTH_REGISTRATION_CREDENTIALS_MISSING',
+      error_code: 'AUTH_REGISTRATION_CREDENTIALS_MISSING',
+    });
   });
 });

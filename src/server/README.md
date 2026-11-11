@@ -1,5 +1,8 @@
 # Server architecture
 
+Tenant management use cases live in `src/server/modules/tenants/`; their Drizzle repository
+contract and adapter live in `src/server/layer-data/tenants/`.
+
 This is server-side application code inside the existing Next.js app, not a second
 NestJS service. Next.js App Router Route Handlers under `src/app/api/` register HTTP
 methods and route policies. Module controllers in the same API boundary own request
@@ -121,6 +124,12 @@ SEED_SUPER_ADMIN_EMAIL=you@example.com
 SEED_SUPER_ADMIN_PASSWORD=<a unique password of at least 12 characters>
 SEED_SUPER_ADMIN_FIRST_NAME=Super
 SEED_SUPER_ADMIN_LAST_NAME=Admin
+SEED_TENANT_ADMIN_EMAIL=admin@example.com
+SEED_TENANT_ADMIN_PASSWORD=<a unique password of at least 12 characters>
+SEED_TENANT_ADULT_EMAIL=adult@example.com
+SEED_TENANT_ADULT_PASSWORD=<a unique password of at least 12 characters>
+SEED_TENANT_CHILD_EMAIL=child@example.com
+SEED_TENANT_CHILD_PASSWORD=<a unique password of at least 12 characters>
 ```
 
 Then run:
@@ -129,10 +138,12 @@ Then run:
 pnpm db:seed
 ```
 
-The command creates a `role_key=admin` user with the wildcard `*` permission and Vietnamese
-preferences. It does not log the password, does not overwrite an existing email, and refuses
-to run when `NODE_ENV=production`. If the email already exists, use a new email; the seed is
-not a password reset tool. Sign in through `/vi/login` using the configured email/password.
+The command assigns the configured platform account `role_key=super_admin` with no tenant,
+and ensures `admin`, `adult`, and `child` accounts exist in tenant `default`. It reconciles
+built-in role permissions in `roles.permission_keys`; it does not write the removed
+`users.permissions` or `users.navbar` columns. Existing account credentials are preserved
+unless `--reset-existing` is passed. The seed refuses to run when `NODE_ENV=production`.
+Sign in through `/vi/login` using the configured email/password.
 The login page also needs its reCAPTCHA site key/secret configured; local development may
 explicitly set `SKIP_CAPTCHA_VERIFICATION=true` in `.env.local` (the bypass is disabled in
 production). Never commit real seed credentials or run this against the production branch.

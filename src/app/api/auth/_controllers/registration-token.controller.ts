@@ -1,5 +1,6 @@
 import { API_URL } from "@/lib/constant";
 import { type NextRequest, NextResponse } from "next/server";
+import { apiError } from "@/app/api/_shared/error-response";
 
 type LoginResponse = {
   status: number;
@@ -13,7 +14,7 @@ export async function handleRegistrationToken(req: NextRequest) {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json({ message: "Missing credentials" }, { status: 400 });
+      return apiError(400, "AUTH_REGISTRATION_CREDENTIALS_MISSING");
     }
 
     const response = await fetch(`${API_URL}/auth/login`, {
@@ -26,12 +27,12 @@ export async function handleRegistrationToken(req: NextRequest) {
     const accessToken = result?.data?.accessToken;
 
     if (!accessToken) {
-      return NextResponse.json({ message: "Login failed" }, { status: 401 });
+      return apiError(401, "AUTH_LOGIN_INVALID_CREDENTIALS");
     }
 
     return NextResponse.json({ accessToken });
   } catch (error) {
     console.error("Registration token error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return apiError(500, "INTERNAL_SERVER_ERROR");
   }
 }

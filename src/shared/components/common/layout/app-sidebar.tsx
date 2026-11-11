@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { LayoutDashboard, Settings } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
-import { IconEventTimeline, IconLogout } from '@/shared/components/common/icons';
+import { IconEventTimeline, IconLogout, IconTenantManagement } from '@/shared/components/common/icons';
 import { clientLogout } from '@/lib/api';
 import { useUserStore } from '@/shared/stores/use-user-store';
 import { ModuleKey, PERMISSION_ALL_WILDCARD } from '@/shared/constants/permissions';
@@ -16,7 +16,7 @@ import {
 type NavItem = {
   href: string;
   testId: string;
-  labelKey: 'dashboards' | 'eventTimeline' | 'userSettings';
+  labelKey: 'dashboards' | 'eventTimeline' | 'userSettings' | 'tenantManagement';
   Icon: React.ComponentType<{ className?: string }>;
   navbarKey?: string;
 };
@@ -24,6 +24,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboards', testId: 'sidebar-dashboards', labelKey: 'dashboards', Icon: LayoutDashboard },
   { href: '/event-timeline', testId: 'sidebar-event-timeline', labelKey: 'eventTimeline', Icon: IconEventTimeline, navbarKey: ModuleKey.EventTimeline },
+  { href: '/tenant-management', testId: 'sidebar-tenant-management', labelKey: 'tenantManagement', Icon: IconTenantManagement, navbarKey: ModuleKey.TenantManagement },
   { href: '/settings', testId: 'sidebar-settings', labelKey: 'userSettings', Icon: Settings },
 ];
 

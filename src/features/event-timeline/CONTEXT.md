@@ -8,7 +8,8 @@ as `event-timeline.create`. The backend owns its permission catalog and exposes 
 `GET /api/permissions`; frontend route/component guards use FE-owned permission keys and
 the user's granted keys from `/api/users/me`, without importing the server catalog.
 
-The current page is a route placeholder. No Event Timeline data endpoint, form,
+`event-timeline.upload` is reserved for a future upload action; no current route accepts
+uploads. The current page is a route placeholder. No Event Timeline data endpoint, form,
 workflow, status, or mutation has been specified yet. Before adding those behaviors,
 write and approve a separate module spec. Every Event Timeline API must check the
 module key on the server, including direct requests that bypass the sidebar.

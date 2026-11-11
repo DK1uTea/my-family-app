@@ -48,6 +48,7 @@ export type DateRangeFilterConfig = {
 type Props = {
   className?: string
   inputClassName?: string
+  searchInputContainerClassName?: string
   placeholder?: string
   searchKey?: string
   filters?: SearchFilterConfig[]
@@ -55,6 +56,8 @@ type Props = {
   useDebounced?: boolean
   debounceDelay?: number
   searchTestId?: string
+  searchLabel?: string
+  onSearchAction?: (value: string) => void
   children?: React.ReactNode
 }
 
@@ -71,6 +74,7 @@ function serializeQueryDate(value?: Date): string | null {
 export function SearchFilterBar({
   className,
   inputClassName,
+  searchInputContainerClassName,
   placeholder,
   searchKey = 'keyword',
   filters = [],
@@ -78,6 +82,8 @@ export function SearchFilterBar({
   useDebounced = true,
   debounceDelay = 500,
   searchTestId,
+  searchLabel,
+  onSearchAction,
   children,
 }: Props) {
   const t = useTranslations('common')
@@ -112,8 +118,11 @@ export function SearchFilterBar({
         searchKey={searchKey}
         placeholder={placeholder}
         testId={searchTestId}
+        label={searchLabel}
+        onSearchAction={onSearchAction}
         useDebounced={useDebounced}
         debounceDelay={debounceDelay}
+        containerClassName={searchInputContainerClassName}
         className={cn('w-72 bg-card', inputClassName)}
       />
 

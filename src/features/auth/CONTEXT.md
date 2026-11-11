@@ -23,6 +23,7 @@ LoginForm
   -> POST /api/auth/login
   -> auth login controller validates CAPTCHA and calls authService.login
   -> AuthService uses the auth repository and Neon to verify credentials and create the session
+  -> the local role and active tenant membership are validated before token issuance
   -> auth login controller calls usersService for the authenticated user's preferences
   -> cookies are set (access, refresh, locale, appearance)
   -> private layout mounts AppInitializer
@@ -34,6 +35,9 @@ LoginForm
 ```
 
 The access token and refresh token are both httpOnly.
+The access token carries signed `sub`, `email`, `roleKey`, and `tenantId` claims. Every
+first-party authenticated API checks those claims against the current local user and tenant;
+stale role/scope and inactive tenant sessions are rejected. `super_admin` has no tenant.
 Browser JavaScript cannot read tokens directly. `src/app/api/[...path]/route.ts`
 reads the `accessToken` cookie on the server and attaches `Authorization: Bearer <token>`
 when proxying to the upstream API. The first-party `/api/users/me` route maps `GET` to the
@@ -62,6 +66,7 @@ Login rules:
 Cookie/session rules:
 
 - `accessToken`: httpOnly, 15 minutes, path `/`.
+- Signed access claims use the local DB membership: `roleKey` and nullable `tenantId`.
 - `refreshToken`: httpOnly, seven days, path `/`.
 - Locale and appearance come from the local user's preferences during login; invalid/missing
   values fall back to Vietnamese (`vi`) and `light`.
@@ -154,11 +159,13 @@ Failure is treated as an expired session and logs the user out.
 ## Development seed accounts
 
 `pnpm db:seed` is restricted to `NEON_BRANCH=development` and refuses production. It
-ensures one user exists for each built-in role. The super admin uses
-`SEED_SUPER_ADMIN_EMAIL` and `SEED_SUPER_ADMIN_PASSWORD`; adult and child seed users use
-`adult.seed@local.test` / `adult.seed@1234` and `child.seed@local.test` /
-`child.seed@1234`. Adult/child users are created only when their role has no assigned
-account. Existing user credentials and role assignments are left unchanged.
+ensures the tenant `default` (`Default Tenant`) exists and ensures the configured
+`SEED_SUPER_ADMIN_EMAIL` account has the `super_admin` role and no tenant. Tenant `admin`,
+`adult`, and `child` fixture accounts use `SEED_TENANT_ADMIN_EMAIL/PASSWORD`,
+`SEED_TENANT_ADULT_EMAIL/PASSWORD`, and `SEED_TENANT_CHILD_EMAIL/PASSWORD`. Tenant accounts
+are assigned to `default`; credentials are never overwritten without `--reset-existing`.
+Invite registration still uses its external integration; an upstream-created user without a
+matching local tenant membership cannot use local first-party APIs.
 
 ## Change checklist
 

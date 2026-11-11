@@ -10,12 +10,14 @@ export async function GET() {
     const connected = await checkDatabaseConnection();
 
     return NextResponse.json(
-      { status: connected ? "ok" : "unavailable" },
+      connected
+        ? { status: "ok" }
+        : { status: "unavailable", message: "DATABASE_UNAVAILABLE", error_code: "DATABASE_UNAVAILABLE" },
       { status: connected ? 200 : 503, headers: { "Cache-Control": "no-store" } },
     );
   } catch {
     return NextResponse.json(
-      { status: "unavailable" },
+      { status: "unavailable", message: "DATABASE_UNAVAILABLE", error_code: "DATABASE_UNAVAILABLE" },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }

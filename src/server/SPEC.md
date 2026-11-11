@@ -6,6 +6,22 @@ Keep Next.js `route.ts` files short and make each HTTP endpoint's controller-to-
 relationship visible, without changing existing URLs, authorization, request/response
 contracts, cookies, or business behavior.
 
+## Multi-tenant boundary
+
+- `super_admin` is platform-scoped and tenantless. It alone manages tenants and may access
+  explicitly permitted cross-tenant operations.
+- `admin`, `adult`, `child`, and custom tenant roles require an active tenant assignment.
+  Access tokens carry DB-derived `roleKey` and `tenantId`; protected requests reload current
+  identity/scope and reject missing, stale, or inactive membership.
+- First-party tenant-owned repositories include the actor's tenant in every read or
+  mutation predicate. Create operations derive tenant from actor context, never FE headers
+  or payload. Current first-party data is users/preferences/auth; roles and tenants are
+  platform-level. Future business modules follow the same scope rule.
+- The generic external API proxy does not provide row-level isolation. A future proxied
+  endpoint that reads tenant data must enforce scope in its owning upstream service.
+- Tenant CRUD routes are super-admin-only. `/api/users/me` returns tenant-management
+  navbar/permission data for platform super admin.
+
 ## Scope
 
 - First-party business endpoints under `src/app/api/auth/`, `users/`, `roles/`,

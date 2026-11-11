@@ -2,6 +2,7 @@ import { verifyCaptcha } from "@/lib/verify-captcha";
 import { type NextRequest, NextResponse } from "next/server";
 import { authService, verifyAccessToken } from "@/server/modules/auth";
 import { usersService } from "@/server/modules/users";
+import { apiError } from "@/app/api/_shared/error-response";
 
 function setAuthCookies(
   res: NextResponse,
@@ -60,20 +61,14 @@ export async function handleLogin(req: NextRequest) {
     const body = await req.json();
 
     if (!body?.email || !body?.password) {
-      return NextResponse.json(
-        { status: 400, message: ["Email and Password are required"] },
-        { status: 200 },
-      );
+      return apiError(400, "AUTH_LOGIN_MISSING_CREDENTIALS", { transportStatus: 200 });
     }
 
     const { email, password, rememberMe, captchaToken } = body;
 
     const isCaptchaValid = await verifyCaptcha(captchaToken ?? "");
     if (!isCaptchaValid) {
-      return NextResponse.json(
-        { status: 400, message: ["Captcha verification failed"] },
-        { status: 200 },
-      );
+      return apiError(400, "AUTH_CAPTCHA_FAILED", { transportStatus: 200 });
     }
 
     const userAgent = req.headers.get("user-agent") || "";
@@ -120,24 +115,20 @@ export async function handleLogin(req: NextRequest) {
       return nextResponse;
     }
 
-    return NextResponse.json(
-      {
-        status: result.status >= 400 ? result.status : 401,
-        error_code: result.errorCode ?? "AUTH.LOGIN.FAILED",
-        ...(result.attemptsRemaining !== undefined
-          ? { attemptsRemaining: result.attemptsRemaining }
-          : {}),
-        ...(result.loginBlockDuration !== undefined
-          ? { loginBlockDuration: result.loginBlockDuration }
-          : {}),
-      },
-      { status: 200 },
-    );
+    return apiError(result.status >= 400 ? result.status : 401,
+      result.errorCode ?? "AUTH_LOGIN_FAILED", {
+        transportStatus: 200,
+        details: {
+          ...(result.attemptsRemaining !== undefined
+            ? { attemptsRemaining: result.attemptsRemaining }
+            : {}),
+          ...(result.loginBlockDuration !== undefined
+            ? { loginBlockDuration: result.loginBlockDuration }
+            : {}),
+        },
+      });
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json(
-      { status: 500, message: ["Internal Server Error"] },
-      { status: 200 },
-    );
+    return apiError(500, "INTERNAL_SERVER_ERROR", { transportStatus: 200 });
   }
 }
