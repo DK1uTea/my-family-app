@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 const jsonObject = z.record(z.string(), z.unknown());
-const statusMessage = z.object({ status: z.number(), message: z.unknown().optional() });
+const statusMessage = z.object({
+  status: z.number(), message: z.string(), error_code: z.string(),
+});
 
 export type ApiContract = {
   method: "get" | "post" | "put" | "patch" | "delete";
@@ -10,18 +12,92 @@ export type ApiContract = {
   summary: string;
   operationId: string;
   description?: string;
-  parameters?: Array<{ name: string; in: "path"; required: true; schema: z.ZodType }>;
+  parameters?: Array<{
+    name: string;
+    in: "path" | "query";
+    required: boolean;
+    schema: z.ZodType;
+  }>;
   requestBody?: z.ZodType;
   responses: Record<string, { description: string; schema?: z.ZodType }>;
 };
 
 export const apiContracts: ApiContract[] = [
   {
+    method: "get", path: "/api/tenants", tags: ["Tenants"],
+    summary: "List tenants", operationId: "listTenants",
+    parameters: [
+      { name: "search", in: "query", required: false, schema: z.string().max(150) },
+      { name: "page", in: "query", required: false, schema: z.coerce.number().int().positive() },
+      { name: "limit", in: "query", required: false, schema: z.coerce.number().int().min(1).max(100) },
+      { name: "sort", in: "query", required: false, schema: z.enum(["createdAt:desc", "createdAt:asc"]) },
+    ],
+    responses: {
+      "200": { description: "Paginated tenants", schema: z.object({ status: z.literal(200), message: z.string(), data: z.object({ items: z.array(z.object({ id: z.string(), name: z.string(), description: z.string().nullable(), isActive: z.boolean(), createdAt: z.string(), updatedAt: z.string() })), pagination: z.object({ total: z.number(), limit: z.number(), page: z.number(), totalPages: z.number(), hasNextPage: z.boolean(), hasPrevPage: z.boolean() }) }) }) },
+      "401": { description: "Authentication required", schema: statusMessage },
+      "403": { description: "Super admin role required", schema: statusMessage },
+      "400": { description: "Invalid list query parameter", schema: statusMessage },
+    },
+  },
+  {
+    method: "post", path: "/api/tenants", tags: ["Tenants"],
+    summary: "Create a tenant", operationId: "createTenant",
+    requestBody: z.object({
+      name: z.string(),
+      description: z.string().max(500).nullable().optional(),
+    }).strict(),
+    responses: {
+      "201": { description: "Tenant created", schema: jsonObject },
+      "400": { description: "Invalid tenant", schema: statusMessage },
+      "401": { description: "Authentication required", schema: statusMessage },
+      "403": { description: "Super admin role required", schema: statusMessage },
+      "409": { description: "Tenant ID already exists (TENANT_ID_EXISTS)", schema: statusMessage },
+    },
+  },
+  {
+    method: "patch", path: "/api/tenants/{id}", tags: ["Tenants"],
+    summary: "Update tenant details", operationId: "updateTenant",
+    parameters: [{ name: "id", in: "path", required: true, schema: z.string() }],
+    requestBody: z.object({
+      name: z.string(),
+      description: z.string().max(500).nullable().optional(),
+    }),
+    responses: {
+      "200": { description: "Tenant updated", schema: jsonObject },
+      "400": { description: "Invalid tenant", schema: statusMessage },
+      "401": { description: "Authentication required", schema: statusMessage },
+      "403": { description: "Super admin role required", schema: statusMessage },
+      "404": { description: "Tenant not found", schema: statusMessage },
+    },
+  },
+  {
+    method: "patch", path: "/api/tenants/{id}/activate", tags: ["Tenants"],
+    summary: "Activate a tenant", operationId: "activateTenant",
+    parameters: [{ name: "id", in: "path", required: true, schema: z.string() }],
+    responses: {
+      "200": { description: "Tenant activated", schema: jsonObject },
+      "401": { description: "Authentication required", schema: statusMessage },
+      "403": { description: "Super admin role required", schema: statusMessage },
+      "404": { description: "Tenant not found", schema: statusMessage },
+    },
+  },
+  {
+    method: "patch", path: "/api/tenants/{id}/deactivate", tags: ["Tenants"],
+    summary: "Deactivate a tenant", operationId: "deactivateTenant",
+    parameters: [{ name: "id", in: "path", required: true, schema: z.string() }],
+    responses: {
+      "200": { description: "Tenant deactivated", schema: jsonObject },
+      "401": { description: "Authentication required", schema: statusMessage },
+      "403": { description: "Super admin role required", schema: statusMessage },
+      "404": { description: "Tenant not found", schema: statusMessage },
+    },
+  },
+  {
     method: "get", path: "/api/health/database", tags: ["Health"],
     summary: "Check database connectivity", operationId: "getDatabaseHealth",
     responses: {
       "200": { description: "The application can reach Neon Postgres", schema: z.object({ status: z.literal("ok") }) },
-      "503": { description: "The database is unavailable", schema: z.object({ status: z.literal("unavailable") }) },
+      "503": { description: "The database is unavailable", schema: z.object({ status: z.literal("unavailable"), message: z.literal("DATABASE_UNAVAILABLE"), error_code: z.literal("DATABASE_UNAVAILABLE") }) },
     },
   },
   {
@@ -78,9 +154,9 @@ export const apiContracts: ApiContract[] = [
     requestBody: z.object({ email: z.email(), password: z.string() }),
     responses: {
       "200": { description: "Short-lived access token", schema: z.object({ accessToken: z.string() }) },
-      "400": { description: "Credentials are missing", schema: z.object({ message: z.string() }) },
-      "401": { description: "Login failed", schema: z.object({ message: z.string() }) },
-      "500": { description: "Unexpected server error", schema: z.object({ message: z.string() }) },
+      "400": { description: "Credentials are missing", schema: statusMessage },
+      "401": { description: "Login failed", schema: statusMessage },
+      "500": { description: "Unexpected server error", schema: statusMessage },
     },
   },
   {
@@ -137,6 +213,7 @@ export const apiContracts: ApiContract[] = [
 
 export const apiTags = [
   { name: "Health", description: "Application health and connectivity" },
+  { name: "Tenants", description: "Platform tenant administration" },
   { name: "Auth", description: "Authentication endpoints" },
   { name: "Users", description: "User profile endpoints" },
   { name: "Roles", description: "Role and action permission administration" },

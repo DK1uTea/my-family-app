@@ -13,6 +13,7 @@ describe('frontend permission keys', () => {
       Create: 'event-timeline.create',
       Edit: 'event-timeline.edit',
       Delete: 'event-timeline.delete',
+      Upload: 'event-timeline.upload',
     });
   });
 

@@ -26,10 +26,20 @@ describe('auth session controllers', () => {
     const response = await handleRefreshToken();
 
     expect(response.status).toBe(401);
-    await expect(response.json()).resolves.toEqual({ status: 401, message: 'Missing refresh token' });
+    await expect(response.json()).resolves.toEqual({ status: 401, message: 'AUTH_REFRESH_TOKEN_MISSING', error_code: 'AUTH_REFRESH_TOKEN_MISSING' });
     expect(refresh).not.toHaveBeenCalled();
     expect(response.headers.get('set-cookie')).toContain('accessToken=');
     expect(response.headers.get('set-cookie')).toContain('refreshToken=');
+  });
+
+  it('returns a localized key when a stored refresh token is invalid', async () => {
+    cookieStore.get.mockReturnValue({ value: 'old-refresh' });
+    refresh.mockResolvedValue({ success: false, status: 401, message: 'AUTH_REFRESH_TOKEN_INVALID' });
+
+    const response = await handleRefreshToken();
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({ status: 401, message: 'AUTH_REFRESH_TOKEN_INVALID', error_code: 'AUTH_REFRESH_TOKEN_INVALID' });
   });
 
   it('rotates the access and refresh cookies after successful refresh', async () => {

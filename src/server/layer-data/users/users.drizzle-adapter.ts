@@ -3,7 +3,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { DateFormat } from "@/lib/date-utils";
 import { nowUtc } from "@/lib/date-utils";
-import { roles, userPreferences, users } from "@/server/drizzle/schema";
+import { roles, tenants, userPreferences, users } from "@/server/drizzle/schema";
 import { db } from "@/server/third-party/drizzle/client";
 import type { UsersRepository } from "./users.repository";
 import type {
@@ -43,6 +43,10 @@ export class DrizzleUsersRepository implements UsersRepository {
       .limit(1);
 
     const pref = prefRows[0];
+    const tenantRows = user.tenantId
+      ? await db.select({ id: tenants.id, name: tenants.name, isActive: tenants.isActive })
+          .from(tenants).where(eq(tenants.id, user.tenantId)).limit(1)
+      : [];
     const preferences: UserPreferencesRecord = {
       preferredLanguage:
         (pref?.preferredLanguage as "vi" | "en") ??
@@ -67,6 +71,7 @@ export class DrizzleUsersRepository implements UsersRepository {
         name: role?.name,
         permissions: permissionKeys,
       },
+      tenant: tenantRows[0] ?? null,
       preferences,
     };
   }

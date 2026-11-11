@@ -1,4 +1,4 @@
-# 01 — Architecture
+# 01 â€” Architecture
 
 ## Full-stack boundary
 
@@ -9,20 +9,20 @@ runtime and does not add a NestJS app.
 
 ```text
 Browser / React features
-        │ same-origin /api requests
-        ▼
+        â”‚ same-origin /api requests
+        â–¼
 Next.js Route Handlers: src/app/api/**/route.ts
-        │ call
-        ▼
+        â”‚ call
+        â–¼
 Server modules: src/server/modules/<domain>
-        │ repository interfaces
-        ▼
+        â”‚ repository interfaces
+        â–¼
 Layer data: src/server/layer-data/<domain>
-        │ Prisma domain adapter
-        ▼
-Shared Prisma client: src/server/third-party/prisma
-        │ Neon driver adapter
-        ▼
+        â”‚ Drizzle domain adapter
+        â–¼
+Shared Drizzle client: src/server/third-party/prisma
+        â”‚ Neon driver adapter
+        â–¼
 Neon Postgres
 ```
 
@@ -30,30 +30,34 @@ Neon Postgres
 
 ```text
 src/
-├── app/
-│   ├── api/                       # Route Handlers: HTTP boundary
-│   │   ├── [...path]/             # Existing external API proxy
-│   │   ├── auth/                  # Existing auth handlers during migration
-│   │   └── health/database/       # First-party Neon probe
-│   └── [locale]/                  # Locale-aware UI routes
-├── features/<name>/               # UI features and CONTEXT.md
-├── server/
-│   ├── SPEC.md                    # Cross-cutting server foundation spec
-│   ├── modules/
-│   │   ├── auth/SPEC.md            # Auth endpoint and behavior contract
-│   │   └── users/SPEC.md           # User endpoint and behavior contract
-│   ├── layer-data/                # Repository contracts and implementations
-│   ├── third-party/neon/           # Neon provider integration
-│   ├── third-party/prisma/         # Shared Prisma Client with Neon adapter
-│   ├── openapi/                    # OpenAPI source document
-│   ├── core/                      # Shared server primitives
-│   └── config/                    # Validated server environment
-├── i18n/                          # Locale routing and navigation
-├── lib/                           # Shared frontend utilities/API client
-└── shared/                        # UI primitives, providers and app-wide state
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ api/                       # Route Handlers: HTTP boundary
+â”‚   â”‚   â”œâ”€â”€ [...path]/             # Existing external API proxy
+â”‚   â”‚   â”œâ”€â”€ auth/                  # Existing auth handlers during migration
+â”‚   â”‚   â””â”€â”€ health/database/       # First-party Neon probe
+â”‚   â””â”€â”€ [locale]/                  # Locale-aware UI routes
+â”œâ”€â”€ features/<name>/               # UI features and CONTEXT.md
+â”œâ”€â”€ server/
+â”‚   â”œâ”€â”€ SPEC.md                    # Cross-cutting server foundation spec
+â”‚   â”œâ”€â”€ modules/
+â”‚   â”‚   â”œâ”€â”€ auth/SPEC.md            # Auth endpoint and behavior contract
+â”‚   â”‚   â””â”€â”€ users/SPEC.md           # User endpoint and behavior contract
+â”‚   â”œâ”€â”€ layer-data/                # Repository contracts and implementations
+â”‚   â”œâ”€â”€ third-party/neon/           # Neon provider integration
+â”‚   â”œâ”€â”€ third-party/prisma/         # Shared Drizzle Client with Neon adapter
+â”‚   â”œâ”€â”€ openapi/                    # OpenAPI source document
+â”‚   â”œâ”€â”€ core/                      # Shared server primitives
+â”‚   â””â”€â”€ config/                    # Validated server environment
+â”œâ”€â”€ i18n/                          # Locale routing and navigation
+â”œâ”€â”€ lib/                           # Shared frontend utilities/API client
+â””â”€â”€ shared/                        # UI primitives, providers and app-wide state
 ```
 
 ## Backend module boundaries
+
+Tenant management lives in `src/server/modules/tenants/` and its persistence adapter in
+`src/server/layer-data/tenants/`. Authenticated actors carry DB-verified `roleKey` and
+`tenantId`; every tenant-owned repository operation must enforce that scope.
 
 - A Route Handler owns transport concerns: input parsing, HTTP status, headers, and
   cookies. It delegates business decisions to a server module.
@@ -69,15 +73,15 @@ src/
 
 ## Database and environment branches
 
-Neon Postgres is the selected cloud database and Prisma ORM is the selected persistence
-layer. Runtime Prisma queries use Prisma's Neon driver adapter and pooled `DATABASE_URL`;
-Prisma migrations use the direct `DATABASE_URL_UNPOOLED` connection. Prisma config,
+Neon Postgres is the selected cloud database and Drizzle ORM is the selected persistence
+layer. Runtime Drizzle queries use Drizzle's Neon driver adapter and pooled `DATABASE_URL`;
+Drizzle migrations use the direct `DATABASE_URL_UNPOOLED` connection. Drizzle config,
 schema, per-domain models and migrations are grouped under `src/server/prisma/`.
 
 For first-party requests, keep the reference backend's responsibilities without adding
-Nest: Route Handler -> domain module service -> repository contract -> Prisma repository
-adapter -> shared Prisma client -> Neon. Route Handlers act as controllers; TypeScript
-factories compose dependencies. Routes and services do not access Prisma directly.
+Nest: Route Handler -> domain module service -> repository contract -> Drizzle repository
+adapter -> shared Drizzle client -> Neon. Route Handlers act as controllers; TypeScript
+factories compose dependencies. Routes and services do not access Drizzle directly.
 
 Swagger UI is available at `/api/docs` and its OpenAPI JSON at `/api/openapi.json`.
 Production serves neither unless `API_DOCS_ENABLED=true`.

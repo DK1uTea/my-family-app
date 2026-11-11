@@ -22,11 +22,14 @@ bootstrap and `useMe()` do not depend on the external backend.
 - A valid access token returns the current user's profile and preferences in the shared
   `{ status, message, error_code, data }` envelope.
 - `data.role.navbar` is derived from persisted role permissions. It contains module keys
-  for which the role has read permission, or `["*"]` for wildcard admin. Dashboard and
+  for which the role has read permission, or a wildcard for `super_admin`. Dashboard and
   Settings are always visible in the frontend and do not appear in this list.
-- `data.role.permissions` contains the role's granted action permission keys. User-level
-  legacy permission and navbar columns are not used to grant access and are retained only
-  during migration.
+- `data.role.permissions` contains the role's granted action permission keys. The legacy
+  `users.permissions` and `users.navbar` columns were removed after role-derived access
+  replaced them.
+- `data.tenant` is `{ id, name, isActive }` for tenant users and `null` for platform
+  `super_admin`. The super-admin role has the tenant-management permission and navbar key;
+  tenant roles do not.
 - A missing/invalid role yields empty permission and navbar lists, never admin access.
 - The default currency for new preferences and missing preference records is `VND`.
   A data migration changes every existing `user_preferences.currency` value to `VND`;

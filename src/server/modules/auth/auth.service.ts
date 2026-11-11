@@ -10,9 +10,16 @@ import {
   hashToken,
   signAccessToken,
   signRefreshToken,
+  verifyAccessToken,
   verifyRefreshToken,
 } from "./auth.jwt";
-import type { LoginInput, LoginResult, RefreshResult } from "./auth.types";
+import { UserRole } from "@/server/modules/roles/permissions";
+import type {
+  AuthenticatedActor,
+  LoginInput,
+  LoginResult,
+  RefreshResult,
+} from "./auth.types";
 
 const REFRESH_TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -72,12 +79,18 @@ export class AuthService {
       };
     }
 
+    if (!this.hasValidTenantScope(user)) {
+      return { success: false, status: 403, errorCode: "AUTH.TENANT_ACCESS_DENIED" };
+    }
+
     await this.repo.resetFailedAttempts(user.userId);
 
     const expiresAt = new Date(now.getTime() + REFRESH_TOKEN_LIFETIME_MS);
     const accessToken = await signAccessToken({
       sub: user.userId,
       email: user.email,
+      roleKey: user.roleKey!,
+      tenantId: user.tenantId,
     });
 
     const refreshToken = await signRefreshToken({
@@ -95,7 +108,7 @@ export class AuthService {
 
     const status = user.mustChangePassword ? 203 : 200;
     const message = user.mustChangePassword
-      ? "Password change required"
+      ? "AUTH_PASSWORD_CHANGE_REQUIRED"
       : "OK";
 
     return {
@@ -109,7 +122,7 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<RefreshResult> {
     const payload = await verifyRefreshToken(refreshToken);
     if (!payload?.sub) {
-      return { success: false, status: 401, message: "Invalid refresh token" };
+      return { success: false, status: 401, message: "AUTH_REFRESH_TOKEN_INVALID" };
     }
 
     const currentHash = hashToken(refreshToken);
@@ -117,14 +130,20 @@ export class AuthService {
 
     if (
       !existing ||
+      existing.userId !== payload.sub ||
       existing.revokedAt ||
       existing.expiresAt.getTime() <= nowUtc().getTime()
     ) {
       return {
         success: false,
         status: 401,
-        message: "Refresh token expired or revoked",
+        message: "AUTH_REFRESH_TOKEN_INVALID",
       };
+    }
+
+    const identity = await this.repo.findIdentityById(payload.sub);
+    if (!identity || !this.hasValidTenantScope(identity)) {
+      return { success: false, status: 401, message: "AUTH_TENANT_ACCESS_DENIED" };
     }
 
     await this.repo.revokeRefreshToken(currentHash);
@@ -134,7 +153,9 @@ export class AuthService {
 
     const newAccessToken = await signAccessToken({
       sub: payload.sub,
-      email: "",
+      email: identity.email,
+      roleKey: identity.roleKey!,
+      tenantId: identity.tenantId,
     });
 
     const newRefreshToken = await signRefreshToken({
@@ -156,6 +177,36 @@ export class AuthService {
         refreshToken: newRefreshToken,
       },
     };
+  }
+
+  async authenticateAccessToken(token: string): Promise<AuthenticatedActor | null> {
+    const payload = await verifyAccessToken(token);
+    if (!payload?.sub || !payload.roleKey || payload.tenantId === undefined) return null;
+
+    const identity = await this.repo.findIdentityById(payload.sub);
+    if (!identity || !this.hasValidTenantScope(identity)) return null;
+    if (
+      identity.roleKey !== payload.roleKey ||
+      identity.tenantId !== payload.tenantId ||
+      identity.email !== payload.email
+    ) {
+      return null;
+    }
+
+    return {
+      userId: identity.userId,
+      email: identity.email,
+      roleKey: identity.roleKey,
+      tenantId: identity.tenantId,
+    };
+  }
+
+  private hasValidTenantScope(
+    user: { roleKey: string | null; tenantId: string | null; tenantIsActive: boolean | null },
+  ): user is { roleKey: string; tenantId: string | null; tenantIsActive: boolean | null } {
+    if (!user.roleKey) return false;
+    if (user.roleKey === UserRole.SUPER_ADMIN) return user.tenantId === null;
+    return user.tenantId !== null && user.tenantIsActive === true;
   }
 
   async logout(refreshToken?: string): Promise<{ status: number }> {

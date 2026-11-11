@@ -47,7 +47,7 @@ describe('roles API controllers', () => {
     );
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toMatchObject({ message: 'Invalid role' });
+    await expect(response.json()).resolves.toMatchObject({ message: 'ROLE_INVALID', error_code: 'ROLE_INVALID' });
     expect(create).not.toHaveBeenCalled();
   });
 
@@ -59,7 +59,7 @@ describe('roles API controllers', () => {
     );
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toMatchObject({ message: 'Unknown role permission' });
+    await expect(response.json()).resolves.toMatchObject({ message: 'ROLE_UNKNOWN_PERMISSION', error_code: 'ROLE_UNKNOWN_PERMISSION' });
     expect(create).not.toHaveBeenCalled();
   });
 
@@ -91,7 +91,7 @@ describe('roles API controllers', () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toMatchObject({
-      message: 'Role already exists or is reserved',
+      message: 'ROLE_ALREADY_EXISTS', error_code: 'ROLE_ALREADY_EXISTS',
     });
   });
 
@@ -105,7 +105,7 @@ describe('roles API controllers', () => {
     );
 
     expect(response.status).toBe(404);
-    await expect(response.json()).resolves.toEqual({ status: 404, message: 'Role not found' });
+    await expect(response.json()).resolves.toEqual({ status: 404, message: 'ROLE_NOT_FOUND', error_code: 'ROLE_NOT_FOUND' });
   });
 
   it('returns the established 404 response when a role update target is missing', async () => {
@@ -118,7 +118,7 @@ describe('roles API controllers', () => {
     );
 
     expect(response.status).toBe(404);
-    await expect(response.json()).resolves.toEqual({ status: 404, message: 'Role not found' });
+    await expect(response.json()).resolves.toEqual({ status: 404, message: 'ROLE_NOT_FOUND', error_code: 'ROLE_NOT_FOUND' });
   });
 
   it('rejects role updates with unknown permissions', async () => {
@@ -149,7 +149,8 @@ describe('roles API controllers', () => {
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
       status: 403,
-      message: 'Admin role cannot be edited',
+      message: 'ROLE_RESERVED',
+      error_code: 'ROLE_RESERVED',
     });
     expect(updateForAdmin).toHaveBeenCalledWith('admin', {
       name: 'Administrator',

@@ -17,6 +17,10 @@
       "description": "Application health and connectivity"
     },
     {
+      "name": "Tenants",
+      "description": "Platform tenant administration"
+    },
+    {
       "name": "Auth",
       "description": "Authentication endpoints"
     },
@@ -30,6 +34,812 @@
     }
   ],
   "paths": {
+    "/api/tenants": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "List tenants",
+        "operationId": "listTenants",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createdAt:desc",
+                "createdAt:asc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated tenants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number",
+                      "const": 200
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "isActive": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "description",
+                              "isActive",
+                              "createdAt",
+                              "updatedAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "limit": {
+                              "type": "number"
+                            },
+                            "page": {
+                              "type": "number"
+                            },
+                            "totalPages": {
+                              "type": "number"
+                            },
+                            "hasNextPage": {
+                              "type": "boolean"
+                            },
+                            "hasPrevPage": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "total",
+                            "limit",
+                            "page",
+                            "totalPages",
+                            "hasNextPage",
+                            "hasPrevPage"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "pagination"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid list query parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Super admin role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Create a tenant",
+        "operationId": "createTenant",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tenant created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Super admin role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Tenant ID already exists (TENANT_ID_EXISTS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{id}": {
+      "patch": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Update tenant details",
+        "operationId": "updateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tenant updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Super admin role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{id}/activate": {
+      "patch": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Activate a tenant",
+        "operationId": "activateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Super admin role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenants/{id}/deactivate": {
+      "patch": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Deactivate a tenant",
+        "operationId": "deactivateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant deactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Super admin role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message",
+                    "error_code"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health/database": {
       "get": {
         "tags": [
@@ -68,10 +878,20 @@
                     "status": {
                       "type": "string",
                       "const": "unavailable"
+                    },
+                    "message": {
+                      "type": "string",
+                      "const": "DATABASE_UNAVAILABLE"
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "const": "DATABASE_UNAVAILABLE"
                     }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -185,10 +1005,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -205,10 +1032,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -265,10 +1099,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -285,10 +1126,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -345,10 +1193,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -365,10 +1220,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -470,10 +1332,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -534,10 +1403,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -607,12 +1483,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "status": {
+                      "type": "number"
+                    },
                     "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "message"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -626,12 +1510,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "status": {
+                      "type": "number"
+                    },
                     "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "message"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -645,12 +1537,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "status": {
+                      "type": "number"
+                    },
                     "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "message"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -723,10 +1623,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -743,10 +1650,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -788,10 +1702,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -808,10 +1729,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -853,10 +1781,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -873,10 +1808,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -946,10 +1888,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -966,10 +1915,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -986,10 +1942,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1006,10 +1969,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1061,10 +2031,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1081,10 +2058,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1101,10 +2085,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1180,10 +2171,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1200,10 +2198,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1220,10 +2225,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1240,10 +2252,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1302,10 +2321,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1322,10 +2348,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1342,10 +2375,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1362,10 +2402,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }
@@ -1382,10 +2429,17 @@
                     "status": {
                       "type": "number"
                     },
-                    "message": {}
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "type": "string"
+                    }
                   },
                   "required": [
-                    "status"
+                    "status",
+                    "message",
+                    "error_code"
                   ],
                   "additionalProperties": false
                 }

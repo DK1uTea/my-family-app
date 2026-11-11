@@ -1,5 +1,6 @@
 import type { SVGProps } from 'react';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { describe, expect, it, vi } from 'vitest';
@@ -58,6 +59,44 @@ function renderFilter({
 }
 
 describe('SearchFilterBar', () => {
+  it('forwards a committed normalized search value to its callback', async () => {
+    const user = userEvent.setup();
+    const onSearchAction = vi.fn();
+
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <NuqsTestingAdapter>
+          <SearchFilterBar
+            placeholder="Search tenants"
+            searchLabel="Search tenants"
+            useDebounced={false}
+            onSearchAction={onSearchAction}
+          />
+        </NuqsTestingAdapter>
+      </NextIntlClientProvider>,
+    );
+
+    await user.type(screen.getByRole('textbox', { name: 'Search tenants' }), '  Default  {Enter}');
+
+    expect(onSearchAction).toHaveBeenCalledWith('Default');
+  });
+
+  it('renders a real associated label for the search input', () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <NuqsTestingAdapter>
+          <SearchFilterBar placeholder="Search tenants" searchLabel="Tenant search" />
+        </NuqsTestingAdapter>
+      </NextIntlClientProvider>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Tenant search' });
+    const label = screen.getByText('Tenant search');
+
+    expect(label.tagName).toBe('LABEL');
+    expect(label).toHaveAttribute('for', input.id);
+  });
+
   it('shows the default filter icon when enabled and no option is selected', () => {
     const trigger = renderFilter({ showIcon: true });
 

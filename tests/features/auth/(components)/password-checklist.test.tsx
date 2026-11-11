@@ -101,18 +101,18 @@ describe('PasswordChecklist', () => {
     }
   })
 
-  // Sheet vs implementation contradiction: the requirements sheet claims "(" and ")" are
-  // among the accepted special characters for this rule. The real regex in
-  // src/shared/schemas/password.schema.ts is /[@$!%*?&\-+=\#.]+/ — it contains no
-  // parenthesis at all, so a password whose only "special" character is "(" or ")" is
-  // (correctly, per the real implementation) marked red, not green. Flagging rather than
-  // asserting a behaviour the code doesn't have.
-  it.todo(
-    'sheet claims "(" and ")" count as an accepted special character — the real regex ' +
-      '/[@$!%*?&\\-+=\\#.]+/ in password.schema.ts has no parentheses in it; a password like ' +
-      '"Abcdefg1(" stays red on this rule. Contradiction to confirm with the business, not a ' +
-      'bug to silently "fix" in the schema from a QA test.',
-  )
+  it('keeps parentheses outside the accepted special-character set', () => {
+    for (const symbol of ['(', ')']) {
+      const { unmount } = render(
+        <NextIntlClientProvider locale="en" messages={messages}>
+          <PasswordChecklist password={`Abcdefg1${symbol}`} />
+        </NextIntlClientProvider>,
+      )
+
+      expect(itemFor('One special character')).toHaveClass('text-destructive')
+      unmount()
+    }
+  })
 
   it('shows every requirement green once all five pass, with no "must meet requirements" banner', () => {
     renderChecklist('Abcdefg1@')
@@ -125,13 +125,13 @@ describe('PasswordChecklist', () => {
     expect(screen.queryByText('Password must meet all requirements')).not.toBeInTheDocument()
   })
 
-  // Sheet vs implementation contradiction: the sheet describes a "blue" in-progress state
-  // for requirements. The component (src/features/auth/(components)/password-checklist.tsx)
-  // only ever applies `text-green-600`/`bg-green-500` (passed) or
-  // `text-destructive`/`bg-destructive` (failed) — there is no third/blue class anywhere.
-  it.todo(
-    'sheet describes a "blue" requirements-met-so-far state — PasswordChecklist has only ' +
-      'red (failed) and green (passed) classes, no blue state exists in the real component. ' +
-      'Contradiction to confirm with the business, not something to invent a test for.',
-  )
+  it('keeps unmet requirements visible until all password rules pass', () => {
+    renderChecklist('Abcdefgh')
+
+    expect(screen.getByText('Password must meet all requirements')).toBeInTheDocument()
+    expect(itemFor('One number')).toHaveClass('text-destructive')
+    expect(itemFor('One special character')).toHaveClass('text-destructive')
+    expect(itemFor('One lowercase letter')).toHaveClass('text-green-600')
+    expect(itemFor('One uppercase letter')).toHaveClass('text-green-600')
+  })
 })

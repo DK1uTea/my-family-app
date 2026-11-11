@@ -5,12 +5,20 @@ export type AuthCredentialRecord = {
   userId: string;
   email: string;
   passwordHash: string;
+  roleKey: string | null;
+  tenantId: string | null;
+  tenantIsActive: boolean | null;
   isLocked: boolean;
   lockedUntil: Date | null;
   failedAttempts: number;
   maxAttempts: number;
   mustChangePassword: boolean;
 };
+
+export type AuthIdentityRecord = Pick<
+  AuthCredentialRecord,
+  "userId" | "email" | "roleKey" | "tenantId" | "tenantIsActive"
+>;
 
 export type CreateRefreshTokenData = {
   userId: string;

@@ -79,7 +79,7 @@ describe('users API controllers', () => {
     );
 
     expect(response.status).toBe(404);
-    await expect(response.json()).resolves.toEqual({ status: 404, message: 'User not found' });
+    await expect(response.json()).resolves.toEqual({ status: 404, message: 'USER_NOT_FOUND', error_code: 'USER_NOT_FOUND' });
   });
 
   it('rejects malformed role assignment input without calling the service', async () => {
@@ -90,10 +90,11 @@ describe('users API controllers', () => {
     );
 
     expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ status: 400, message: 'USER_ROLE_ASSIGNMENT_INVALID', error_code: 'USER_ROLE_ASSIGNMENT_INVALID' });
     expect(assignForActor).not.toHaveBeenCalled();
   });
 
-  it('prevents an administrator from removing their own admin role', async () => {
+  it('returns a generic forbidden response for a rejected role assignment', async () => {
     assignForActor.mockResolvedValue('forbidden');
 
     const response = await usersController.assignRole(
@@ -104,9 +105,39 @@ describe('users API controllers', () => {
 
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toMatchObject({
-      message: 'Cannot remove own admin role',
+      message: 'USER_ROLE_ASSIGNMENT_FORBIDDEN', error_code: 'USER_ROLE_ASSIGNMENT_FORBIDDEN',
     });
     expect(assignForActor).toHaveBeenCalledWith(profile.id, profile.id, 'adult');
+  });
+
+  it('returns forbidden when a tenant administrator targets a user outside their tenant', async () => {
+    assignForActor.mockResolvedValue('forbidden');
+
+    const response = await usersController.assignRole(
+      jsonRequest({ roleKey: 'adult' }),
+      'tenant-admin-a',
+      { params: Promise.resolve({ id: profile.id }) },
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      message: 'USER_ROLE_ASSIGNMENT_FORBIDDEN', error_code: 'USER_ROLE_ASSIGNMENT_FORBIDDEN',
+    });
+  });
+
+  it('returns forbidden when a tenant administrator tries to grant super admin', async () => {
+    assignForActor.mockResolvedValue('forbidden');
+
+    const response = await usersController.assignRole(
+      jsonRequest({ roleKey: 'super_admin' }),
+      'tenant-admin-a',
+      { params: Promise.resolve({ id: profile.id }) },
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      message: 'USER_ROLE_ASSIGNMENT_FORBIDDEN', error_code: 'USER_ROLE_ASSIGNMENT_FORBIDDEN',
+    });
   });
 
   it('returns 404 when the user or role cannot be assigned', async () => {
@@ -119,6 +150,7 @@ describe('users API controllers', () => {
     );
 
     expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({ status: 404, message: 'USER_ROLE_ASSIGNMENT_NOT_FOUND', error_code: 'USER_ROLE_ASSIGNMENT_NOT_FOUND' });
     expect(assignForActor).toHaveBeenCalledWith('admin-id', profile.id, 'adult');
   });
 

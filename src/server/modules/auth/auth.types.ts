@@ -22,6 +22,13 @@ export type LoginResult = {
   loginBlockDuration?: number;
 };
 
+export type AuthenticatedActor = {
+  userId: string;
+  email: string;
+  roleKey: string;
+  tenantId: string | null;
+};
+
 export type RefreshResult = {
   success: boolean;
   status: number;

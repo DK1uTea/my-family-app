@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/shared/components/ui/button'
 import { MaintenanceView } from '@/shared/components/common/maintenance'
 import { getErrorStatus, isMaintenanceStatus } from '@/lib/get-error-status'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 type Props = {
   error: Error
@@ -11,6 +12,7 @@ type Props = {
 
 export function ErrorPage({ error }: Props) {
   const t = useTranslations('common.error')
+  const responseError = error as Error & { response?: { data?: { error_code?: string } } }
   const reset = () => {
     window.location.reload()
   }
@@ -33,7 +35,9 @@ export function ErrorPage({ error }: Props) {
       </div>
       <div className="space-y-1">
         <h2 className="text-lg font-semibold text-foreground">{t('title')}</h2>
-        <p className="text-sm text-muted-foreground">{error.message || t('description')}</p>
+        <p className="text-sm text-muted-foreground">
+          {getErrorMessage(responseError.response?.data?.error_code ?? error.message)}
+        </p>
       </div>
       <Button variant="default" onClick={reset}>
         {t('retry')}

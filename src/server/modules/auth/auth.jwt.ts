@@ -16,6 +16,8 @@ const REFRESH_SECRET = new TextEncoder().encode(
 export type AccessTokenPayload = {
   sub: string;
   email: string;
+  roleKey: string;
+  tenantId: string | null;
 };
 
 export type RefreshTokenPayload = {

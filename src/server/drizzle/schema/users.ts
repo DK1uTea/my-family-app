@@ -1,5 +1,8 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -8,6 +11,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { tenants } from "./tenants";
 
 export const roles = pgTable("roles", {
   key: varchar("key", { length: 50 }).primaryKey(),
@@ -24,8 +28,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name", { length: 100 }).notNull(),
   avatar: text("avatar"),
   roleKey: varchar("role_key", { length: 50 }).references(() => roles.key),
-  permissions: jsonb("permissions").$type<string[]>().default([]),
-  navbar: jsonb("navbar").$type<string[] | null>().default(null),
+  tenantId: varchar("tenant_id", { length: 50 }).references(() => tenants.id),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   isLocked: boolean("is_locked").default(false).notNull(),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
@@ -34,7 +37,13 @@ export const users = pgTable("users", {
   mustChangePassword: boolean("must_change_password").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [
+  index("idx_users_tenant_id").on(table.tenantId),
+  check(
+    "users_tenant_scope_check",
+    sql`(${table.roleKey} = 'super_admin' AND ${table.tenantId} IS NULL) OR (${table.roleKey} IS DISTINCT FROM 'super_admin' AND ${table.tenantId} IS NOT NULL)`,
+  ),
+]);
 
 export const userPreferences = pgTable("user_preferences", {
   userId: uuid("user_id")

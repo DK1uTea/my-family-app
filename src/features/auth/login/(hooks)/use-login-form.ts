@@ -83,7 +83,7 @@ export function useLoginForm() {
       if (response.status === 203) {
         const message = response.data?.message;
         const text = Array.isArray(message) ? message[0] : message;
-        if (text) toast.warning(text);
+        if (text) toast.warning(getErrorMessage(text));
       }
 
       const params = new URLSearchParams(window.location.search);

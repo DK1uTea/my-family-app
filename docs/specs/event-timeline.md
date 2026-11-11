@@ -6,13 +6,17 @@ specified.
 ## Access contract
 
 - The route is `/{locale}/event-timeline` and its module key is `event-timeline`.
-- The signed-in admin role returns `role.navbar: ["*"]` from `GET /api/users/me`; the
-  wildcard grants access to every module.
-- Dashboard and Settings remain visible in the sidebar regardless of module grants. An
-  admin with `*` also sees Event Timeline.
-- An authenticated admin can open Event Timeline from its sidebar item and by navigating
-  directly to `/vi/event-timeline`. Both paths render the page heading and localized
-  coming-soon placeholder.
+- The platform `super_admin` role may return `role.navbar: ["*"]`; the wildcard grants
+  access to every module. Tenant `admin` access is derived from explicit tenant-role
+  permissions and is scoped to that tenant.
+- Dashboard and Settings remain visible in the sidebar regardless of module grants.
+- Tenant `admin` and `adult` have all current Event Timeline permissions; `child` has
+  `event-timeline.read` and the reserved `event-timeline.upload` permission. The upload
+  action has no endpoint or UI yet.
+- An authenticated tenant admin with `event-timeline.read`, and a platform super admin, can
+  open Event Timeline from its sidebar item and by navigating directly to
+  `/vi/event-timeline`. Both paths render the page heading and localized coming-soon
+  placeholder.
 - An unauthenticated direct request to `/vi/event-timeline` redirects to `/vi/login`.
 - No dedicated restricted-role account is configured; the restricted-module branch is not
   covered by this browser spec.

@@ -22,6 +22,9 @@ assignments.
 - `POST /api/auth/logout` revokes the refresh session when possible and always clears token
   cookies.
 - Access tokens are httpOnly for 15 minutes; refresh tokens are httpOnly for seven days.
+- Access tokens carry `sub`, `email`, `roleKey`, and `tenantId` from the stored user.
+  Protected APIs reload current role and tenant status; missing/stale claims, a tenantless
+  non-super-admin, or inactive tenant is rejected. Refresh reloads current membership.
   Locale and appearance cookies remain readable by the client.
 - Routes return the existing `{ status, message, error_code, data }` envelope. Auth route
   files map HTTP methods to controllers; controllers own HTTP and cookie handling, while
@@ -30,17 +33,27 @@ assignments.
 ## Development seed accounts
 
 - `pnpm db:seed` requires `NEON_BRANCH=development` and refuses `NODE_ENV=production`.
+- The seed reconciles built-in role names and permission keys on every run, including
+  `event-timeline.upload` for `admin`, `adult`, and `child`. Existing account credentials
+  remain unchanged unless `--reset-existing` is passed.
 - The super admin uses `SEED_SUPER_ADMIN_EMAIL` and `SEED_SUPER_ADMIN_PASSWORD`. An existing
   email is unchanged unless the operator explicitly passes `--reset-existing`; reset also
   clears failed-attempt and lockout state.
-- Ensure at least one user is assigned to each built-in role (`admin`, `adult`, `child`).
-  Adult and child fixture emails are `adult.seed@local.test` and `child.seed@local.test`;
-  each password is its email prefix followed by `@1234`.
-- Create an adult or child user only when that role has no assigned user. Never change an
-  existing user's password or role to satisfy the seed. Fail if a fixture email belongs to
-  an unrelated account. Re-running without reset is idempotent.
+- Require tenant admin, adult, and child credentials from
+  `SEED_TENANT_ADMIN_EMAIL/PASSWORD`, `SEED_TENANT_ADULT_EMAIL/PASSWORD`, and
+  `SEED_TENANT_CHILD_EMAIL/PASSWORD`. Create each account only when its role is not already
+  assigned in the initial tenant. Existing tenant role account credentials stay unchanged
+  without `--reset-existing`; with that flag, the configured email/password/name are applied
+  and lockout state is cleared. Fail if a configured email belongs to an unrelated account.
+  Re-running without reset is idempotent.
 - Newly created seed users receive Vietnamese, light appearance, VND, and `DD/MM/YYYY`
   preferences.
+- The configured super-admin seed account is assigned `super_admin` and no tenant. Tenant
+  role accounts use `SEED_TENANT_ADMIN_EMAIL/PASSWORD`,
+  `SEED_TENANT_ADULT_EMAIL/PASSWORD`, and `SEED_TENANT_CHILD_EMAIL/PASSWORD` in tenant
+  `default`. Credentials are not overwritten without `--reset-existing`.
+- Invite acceptance and registration remain upstream/out of scope. An upstream-created user
+  without a matching local user and valid local tenant membership cannot use first-party APIs.
 
 ## Architecture
 

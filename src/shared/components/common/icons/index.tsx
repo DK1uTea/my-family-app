@@ -14,3 +14,4 @@ export { StepIcon } from './icon-step'
 export { IconStar } from './icon-star'
 export { TablerFilters } from './tabler-filters'
 export { IconEventTimeline } from './icon-event-timeline';
+export { IconTenantManagement } from './icon-tenant-management';

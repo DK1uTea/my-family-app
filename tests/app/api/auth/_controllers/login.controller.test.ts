@@ -37,7 +37,8 @@ describe('login controller', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       status: 400,
-      message: ['Email and Password are required'],
+      message: 'AUTH_LOGIN_MISSING_CREDENTIALS',
+      error_code: 'AUTH_LOGIN_MISSING_CREDENTIALS',
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -54,7 +55,8 @@ describe('login controller', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       status: 400,
-      message: ['Captcha verification failed'],
+      message: 'AUTH_CAPTCHA_FAILED',
+      error_code: 'AUTH_CAPTCHA_FAILED',
     });
     expect(login).not.toHaveBeenCalled();
   });
@@ -63,7 +65,7 @@ describe('login controller', () => {
     login.mockResolvedValue({
       success: false,
       status: 423,
-      errorCode: 'AUTH.LOGIN.LOCKED',
+      errorCode: 'AUTH.LOGIN.ACCOUNT_LOCKED',
       attemptsRemaining: 0,
       loginBlockDuration: 900,
       message: 'Account locked',
@@ -78,9 +80,21 @@ describe('login controller', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       status: 423,
-      error_code: 'AUTH.LOGIN.LOCKED',
+      message: 'AUTH.LOGIN.ACCOUNT_LOCKED',
+      error_code: 'AUTH.LOGIN.ACCOUNT_LOCKED',
       attemptsRemaining: 0,
       loginBlockDuration: 900,
+    });
+  });
+
+  it('uses a translation key for unexpected login errors while preserving HTTP 200', async () => {
+    const response = await handleLogin(new NextRequest('http://localhost/api/auth/login', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: '{',
+    }));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      status: 500, message: 'INTERNAL_SERVER_ERROR', error_code: 'INTERNAL_SERVER_ERROR',
     });
   });
 

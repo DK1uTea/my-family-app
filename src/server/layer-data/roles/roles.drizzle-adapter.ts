@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { roles, users } from '@/server/drizzle/schema';
 import { db } from '@/server/third-party/drizzle/client';
 import type { RoleRecord, RolesRepository } from './roles.repository';
@@ -29,6 +29,12 @@ export class DrizzleRolesRepository implements RolesRepository {
     return rows[0]?.roleKey ?? null;
   }
 
+  async findUserTenantId(userId: string): Promise<string | null> {
+    const rows = await db.select({ tenantId: users.tenantId }).from(users)
+      .where(eq(users.id, userId)).limit(1);
+    return rows[0]?.tenantId ?? null;
+  }
+
   async create(role: RoleRecord): Promise<RoleRecord | null> {
     const rows = await db.insert(roles).values(role)
       .onConflictDoNothing({ target: roles.key })
@@ -44,6 +50,17 @@ export class DrizzleRolesRepository implements RolesRepository {
 
   async assign(userId: string, roleKey: string): Promise<boolean> {
     const rows = await db.update(users).set({ roleKey }).where(eq(users.id, userId))
+      .returning({ id: users.id });
+    return rows.length > 0;
+  }
+
+  async assignWithinTenant(
+    userId: string,
+    tenantId: string,
+    roleKey: string,
+  ): Promise<boolean> {
+    const rows = await db.update(users).set({ roleKey })
+      .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
       .returning({ id: users.id });
     return rows.length > 0;
   }

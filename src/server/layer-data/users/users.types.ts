@@ -16,6 +16,8 @@ export type UserRoleRecord = {
   permissions?: string[] | null;
 };
 
+export type UserTenantRecord = { id: string; name: string; isActive: boolean } | null;
+
 /** Persistence-neutral current-user profile shape based on the existing FE contract. */
 export type UserProfileRecord = {
   id: string;
@@ -25,6 +27,7 @@ export type UserProfileRecord = {
   avatar: string | null;
   lastLoginAt: string | null;
   role?: UserRoleRecord;
+  tenant: UserTenantRecord;
   preferences: UserPreferencesRecord;
 };
 

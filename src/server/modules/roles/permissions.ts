@@ -4,12 +4,14 @@ export const UserRole = {
   ADMIN: 'admin',
   ADULT: 'adult',
   CHILD: 'child',
+  SUPER_ADMIN: 'super_admin',
 } as const;
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export const ServerModuleKey = {
   EventTimeline: 'event-timeline',
+  TenantManagement: 'tenant-management',
 } as const;
 
 export const PermissionKey = {
@@ -18,6 +20,13 @@ export const PermissionKey = {
     Create: 'event-timeline.create',
     Edit: 'event-timeline.edit',
     Delete: 'event-timeline.delete',
+    Upload: 'event-timeline.upload',
+  },
+  TenantManagement: {
+    Read: 'tenant-management.read',
+    Create: 'tenant-management.create',
+    Edit: 'tenant-management.edit',
+    Status: 'tenant-management.status',
   },
 } as const;
 
@@ -33,6 +42,18 @@ export const MODULE_PERMISSIONS = [
       { name: 'Create', key: PermissionKey.EventTimeline.Create },
       { name: 'Edit', key: PermissionKey.EventTimeline.Edit },
       { name: 'Delete', key: PermissionKey.EventTimeline.Delete },
+      { name: 'Upload', key: PermissionKey.EventTimeline.Upload },
+    ],
+  },
+  {
+    name: 'Tenant Management',
+    key: ServerModuleKey.TenantManagement,
+    type: 'CHECKBOX',
+    children: [
+      { name: 'Read', key: PermissionKey.TenantManagement.Read },
+      { name: 'Create', key: PermissionKey.TenantManagement.Create },
+      { name: 'Edit', key: PermissionKey.TenantManagement.Edit },
+      { name: 'Change Status', key: PermissionKey.TenantManagement.Status },
     ],
   },
 ] as const;
@@ -52,7 +73,9 @@ export function hasModuleAccess(granted: string[], moduleKey: string): boolean {
 }
 
 export function getNavbarPermissions(granted: string[]): string[] {
-  if (granted.includes(PERMISSION_ALL_WILDCARD)) return [PERMISSION_ALL_WILDCARD];
+  if (granted.includes(PERMISSION_ALL_WILDCARD)) {
+    return [PERMISSION_ALL_WILDCARD, ...MODULE_PERMISSIONS.map((module) => module.key)];
+  }
   return MODULE_PERMISSIONS
     .filter((module) => hasModuleAccess(granted, module.key))
     .map((module) => module.key);

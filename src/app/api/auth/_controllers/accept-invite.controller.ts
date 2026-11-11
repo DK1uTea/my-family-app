@@ -1,5 +1,7 @@
 import { API_URL } from "@/lib/constant";
 import { type NextRequest, NextResponse } from "next/server";
+import { apiError } from "@/app/api/_shared/error-response";
+import { upstreamErrorResponse } from "./upstream-error";
 
 export async function handleAcceptInvite(req: NextRequest) {
   try {
@@ -22,18 +24,12 @@ export async function handleAcceptInvite(req: NextRequest) {
     const statusCode = result?.status ?? response.status;
 
     if (statusCode >= 400) {
-      return NextResponse.json(
-        { error_code: result?.message },
-        { status: statusCode },
-      );
+      return upstreamErrorResponse(result, statusCode);
     }
 
     return NextResponse.json(result, { status: statusCode });
   } catch (error) {
     console.error("Accept invite error:", error);
-    return NextResponse.json(
-      { message: ["Internal Server Error"] },
-      { status: 500 },
-    );
+    return apiError(500, "INTERNAL_SERVER_ERROR");
   }
 }

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { rolesService } from "@/server/modules/roles";
 import { usersService } from "@/server/modules/users";
+import { apiError } from "@/app/api/_shared/error-response";
 
 type RoleContext = { params: Promise<{ id: string }> };
 
@@ -37,7 +38,7 @@ export const usersController = {
   async getMe(_req: NextRequest, userId: string): Promise<Response> {
     const user = await usersService.findProfileById(userId);
     if (!user) {
-      return NextResponse.json({ status: 404, message: "User not found" }, { status: 404 });
+      return apiError(404, "USER_NOT_FOUND");
     }
 
     const preferredLanguage = user.preferences.preferredLanguage ?? "vi";
@@ -54,6 +55,7 @@ export const usersController = {
           avatar: user.avatar,
           lastLoginAt: user.lastLoginAt,
           role: user.role,
+          tenant: user.tenant,
           settings: {
             preferredLanguage,
             appearance,
@@ -78,14 +80,14 @@ export const usersController = {
       .safeParse(await req.json().catch(() => null));
     const { id } = await context.params;
     if (!parsed.success || !z.uuid().safeParse(id).success) {
-      return NextResponse.json({ status: 400, message: "Invalid role assignment" }, { status: 400 });
+      return apiError(400, "USER_ROLE_ASSIGNMENT_INVALID");
     }
     const result = await rolesService.assignForActor(actorId, id, parsed.data.roleKey);
     if (result === "forbidden") {
-      return NextResponse.json({ status: 403, message: "Cannot remove own admin role" }, { status: 403 });
+      return apiError(403, "USER_ROLE_ASSIGNMENT_FORBIDDEN");
     }
     if (result === "not_found") {
-      return NextResponse.json({ status: 404, message: "User or role not found" }, { status: 404 });
+      return apiError(404, "USER_ROLE_ASSIGNMENT_NOT_FOUND");
     }
     return NextResponse.json({ status: 200, message: "OK" });
   },
